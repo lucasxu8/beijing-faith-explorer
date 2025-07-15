@@ -61,7 +61,35 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Religious Categories
+				buddhism: 'hsl(var(--buddhism))',
+				taoism: 'hsl(var(--taoism))',
+				folk: 'hsl(var(--folk))',
+				// Temple Scales
+				national: 'hsl(var(--national))',
+				provincial: 'hsl(var(--provincial))',
+				municipal: 'hsl(var(--municipal))',
+				district: 'hsl(var(--district))',
+				// Map Elements
+				'map-cluster': 'hsl(var(--map-cluster))',
+				'map-selected': 'hsl(var(--map-selected))',
+				'timeline-track': 'hsl(var(--timeline-track))',
+				'timeline-active': 'hsl(var(--timeline-active))'
+			},
+			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-temple': 'var(--gradient-temple)',
+				'gradient-map': 'var(--gradient-map)'
+			},
+			boxShadow: {
+				'temple': 'var(--shadow-temple)',
+				'panel': 'var(--shadow-panel)',
+				'floating': 'var(--shadow-floating)'
+			},
+			transitionProperty: {
+				'smooth': 'var(--transition-smooth)',
+				'temple': 'var(--transition-temple)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
