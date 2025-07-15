@@ -30,7 +30,7 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
   const [mapStyle, setMapStyle] = useState<'vintage' | 'terrain'>('vintage');
   const [zoom, setZoom] = useState(10);
   const [showClusters, setShowClusters] = useState(true);
-  const [mapboxToken, setMapboxToken] = useState('pk.eyJ1IjoidGVzdC1sb3ZhYmxlIiwiYSI6ImNsdmw4cXB6YzFydDIyanM4OGlhZGt5bXcifQ.GglwdQNJZ5TIhF8W9gkHdw');
+  const [mapboxToken, setMapboxToken] = useState('pk.eyJ1IjoiZmFpdGhtYXAiLCJhIjoiY21kNGIwdGhoMGYyczJrb29xMXRtdXJndCJ9.rmmK4c2BTfqFvwNmpXcLhQ');
 
   // 重庆地区宗教场所数据
   const temples: Temple[] = [
@@ -192,6 +192,8 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
       ] // 限制地图范围在重庆周边
     });
 
+    console.log('Map initialized');
+
     // Add navigation controls
     map.current.addControl(
       new mapboxgl.NavigationControl({
@@ -202,8 +204,15 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
       'top-right'
     );
 
-    // Add markers for temples
-    updateMarkers();
+    // Wait for map to load before adding markers
+    map.current.on('load', () => {
+      console.log('Map loaded successfully');
+      updateMarkers();
+    });
+
+    map.current.on('error', (e) => {
+      console.error('Map error:', e);
+    });
 
     return () => {
       markers.current.forEach(marker => marker.remove());
@@ -231,14 +240,23 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
   };
 
   const updateMarkers = () => {
-    if (!map.current) return;
+    if (!map.current) {
+      console.log('Map not ready yet');
+      return;
+    }
+
+    console.log('Updating markers - map ready');
+    console.log('Filtered temples count:', filteredTemples.length);
+    console.log('Current year:', currentYear);
 
     // Clear existing markers
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
 
     // Add new markers
-    filteredTemples.forEach((temple) => {
+    filteredTemples.forEach((temple, index) => {
+      console.log(`Creating marker ${index + 1} for:`, temple.name, 'at coordinates:', temple.coordinates);
+      
       const el = document.createElement('div');
       el.className = 'temple-marker';
       el.style.width = `${getMarkerSize(temple.religion)}px`;
@@ -269,19 +287,26 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
         el.style.border = '2px solid white';
       });
 
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat(temple.coordinates)
-        .addTo(map.current!);
+      try {
+        const marker = new mapboxgl.Marker(el)
+          .setLngLat(temple.coordinates)
+          .addTo(map.current!);
 
-      marker.getElement().addEventListener('click', (e) => {
-        e.stopPropagation();
-        console.log('Marker clicked:', temple.name); // 调试信息
-        onTempleSelect(temple);
-        // 不自动飞行到寺庙位置，避免地图变化让人头晕
-      });
+        console.log(`Marker ${index + 1} added successfully`);
 
-      markers.current.push(marker);
+        marker.getElement().addEventListener('click', (e) => {
+          e.stopPropagation();
+          console.log('Marker clicked:', temple.name);
+          onTempleSelect(temple);
+        });
+
+        markers.current.push(marker);
+      } catch (error) {
+        console.error(`Failed to create marker for ${temple.name}:`, error);
+      }
     });
+
+    console.log('Total markers created:', markers.current.length);
   };
 
   return (
