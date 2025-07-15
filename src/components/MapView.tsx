@@ -32,128 +32,124 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
   const [showClusters, setShowClusters] = useState(true);
   const [mapboxToken, setMapboxToken] = useState('');
 
-  // Real temple data for Chinese religious sites
+  // 重庆地区宗教场所数据
   const temples: Temple[] = [
-    // 佛教寺庙
     {
-      id: "1",
-      name: "少林寺",
-      location: "河南省登封市",
+      id: "cq1",
+      name: "重庆大足石刻宝顶山石窟",
+      location: "重庆市大足区",
       religion: "buddhism",
-      establishedYear: 495,
+      establishedYear: 1179,
       status: "active",
-      description: "少林寺位于河南省登封市嵩山少室山五乳峰下，始建于北魏太和十九年（495年），是中国佛教禅宗祖庭和中国功夫的发源地，有\"禅宗祖庭，功夫圣地\"之称。",
+      description: "大足石刻是重庆大足区境内主要表现为摩崖造像的石窟艺术的总称，为联合国世界文化遗产。",
       imageUrl: "https://images.unsplash.com/photo-1473177104440-ffee2f376098?w=800&h=600&fit=crop",
-      coordinates: [113.0368, 34.5097] as [number, number],
-      relatedPeople: ["达摩祖师", "慧能大师", "释永信"],
-      relatedEvents: ["495年建寺", "明清重修", "1982年对外开放", "2010年申遗成功"]
+      coordinates: [105.7242, 29.7056] as [number, number],
+      relatedPeople: ["赵智凤"],
+      relatedEvents: ["1179年开凿", "1999年列入世界遗产"]
     },
     {
-      id: "2", 
-      name: "灵隐寺",
-      location: "浙江省杭州市",
+      id: "cq2", 
+      name: "重庆慈云寺",
+      location: "重庆市南岸区",
       religion: "buddhism",
-      establishedYear: 328,
+      establishedYear: 1927,
       status: "active",
-      description: "灵隐寺位于杭州市西湖西北面，始建于东晋咸和三年（328年），是江南著名古刹之一。寺内建筑雄伟，佛像庄严，香火旺盛，有\"江南禅宗五山\"之一的美誉。",
+      description: "慈云寺位于重庆南岸区玄坛庙狮子山，是重庆市著名的佛教寺院之一。",
       imageUrl: "https://images.unsplash.com/photo-1466442929976-97f336a657be?w=800&h=600&fit=crop",
-      coordinates: [120.0999, 30.2417] as [number, number],
-      relatedPeople: ["慧理禅师", "济公活佛"],
-      relatedEvents: ["328年建寺", "五代重建", "明清扩建", "现代修复"]
+      coordinates: [106.5805, 29.5647] as [number, number],
+      relatedPeople: ["太虚法师"],
+      relatedEvents: ["1927年重建", "现代修复"]
     },
     {
-      id: "3",
-      name: "法门寺",
-      location: "陕西省宝鸡市扶风县",
-      religion: "buddhism",
-      establishedYear: 220,
+      id: "cq3",
+      name: "重庆华岩寺",
+      location: "重庆市九龙坡区",
+      religion: "buddhism", 
+      establishedYear: 1650,
       status: "active",
-      description: "法门寺位于陕西省宝鸡市扶风县，始建于东汉末年，素有\"关中塔庙始祖\"之称。因安置释迦牟尼佛指骨舍利而成为举国仰望的佛教圣地。",
+      description: "华岩寺位于重庆市九龙坡区华岩镇，始建于清顺治七年，是重庆市著名的佛教寺院。",
       imageUrl: "https://images.unsplash.com/photo-1492321936769-b49830bc1d1e?w=800&h=600&fit=crop",
-      coordinates: [107.9006, 34.4350] as [number, number],
-      relatedPeople: ["玄奘法师", "不空法师"],
-      relatedEvents: ["220年建寺", "唐代重修", "1987年发现地宫", "2009年新建合十舍利塔"]
-    },
-    // 道教宫观
-    {
-      id: "4",
-      name: "武当山金殿",
-      location: "湖北省十堰市丹江口市",
-      religion: "taoism", 
-      establishedYear: 1416,
-      status: "active",
-      description: "武当山金殿位于湖北省十堰市丹江口市武当山天柱峰顶，建于明永乐十四年（1416年），是武当山的最高胜境，供奉真武大帝，是中国道教的重要圣地。",
-      imageUrl: "https://images.unsplash.com/photo-1466442929976-97f336a657be?w=800&h=600&fit=crop",
-      coordinates: [111.0040, 32.6656] as [number, number],
-      relatedPeople: ["张三丰", "明成祖朱棣"],
-      relatedEvents: ["1416年建金殿", "明代全盛时期", "1994年列入世界遗产", "现代修缮保护"]
+      coordinates: [106.4647, 29.4774] as [number, number],
+      relatedPeople: ["寂光法师"],
+      relatedEvents: ["1650年建寺", "现代重修"]
     },
     {
-      id: "5",
-      name: "青城山天师洞",
-      location: "四川省成都市都江堰市",
+      id: "cq4",
+      name: "重庆老君洞道观",
+      location: "重庆市南岸区",
       religion: "taoism",
-      establishedYear: 143,
-      status: "active",
-      description: "青城山天师洞位于四川省成都市都江堰市，是道教发源地之一，始建于东汉顺帝汉安二年（143年）。青城山素有\"青城天下幽\"之美誉，是中国道教的重要发祥地。",
+      establishedYear: 1700,
+      status: "active", 
+      description: "老君洞道观位于重庆南岸区黄桷垭附近，是重庆著名的道教宫观。",
       imageUrl: "https://images.unsplash.com/photo-1473177104440-ffee2f376098?w=800&h=600&fit=crop",
-      coordinates: [103.5712, 30.9006] as [number, number],
-      relatedPeople: ["张道陵天师", "张鲁"],
-      relatedEvents: ["143年创教", "唐宋兴盛", "2000年申遗成功", "现代旅游开发"]
-    },
-    // 天主教堂
-    {
-      id: "6",
-      name: "北京东堂（王府井天主堂）",
-      location: "北京市东城区王府井大街",
-      religion: "catholic",
-      establishedYear: 1655,
-      status: "active",
-      description: "北京东堂位于北京市东城区王府井大街，建于清顺治十二年（1655年），是北京最古老的天主教堂之一。教堂建筑融合了中西方文化特色，是中国天主教的重要场所。",
-      imageUrl: "https://images.unsplash.com/photo-1492321936769-b49830bc1d1e?w=800&h=600&fit=crop",
-      coordinates: [116.4108, 39.9139] as [number, number],
-      relatedPeople: ["利玛窦", "汤若望", "南怀仁"],
-      relatedEvents: ["1655年建堂", "1720年重建", "1904年扩建", "现代修复开放"]
+      coordinates: [106.6158, 29.5086] as [number, number],
+      relatedPeople: ["张三丰传人"],
+      relatedEvents: ["1700年建观", "现代修缮"]
     },
     {
-      id: "7",
-      name: "上海徐家汇天主教堂",
-      location: "上海市徐汇区蒲西路",
+      id: "cq5",
+      name: "重庆天主教堂（若瑟堂）",
+      location: "重庆市渝中区",
       religion: "catholic",
-      establishedYear: 1910,
+      establishedYear: 1900,
       status: "active",
-      description: "上海徐家汇天主教堂位于上海市徐汇区，建于1910年，是上海最大的天主教堂，也是远东最大的哥特式建筑之一，有\"东方巴黎圣母院\"之美誉。",
+      description: "若瑟堂位于重庆市渝中区民生路，是重庆重要的天主教教堂。",
       imageUrl: "https://images.unsplash.com/photo-1466442929976-97f336a657be?w=800&h=600&fit=crop",
-      coordinates: [121.4378, 31.1956] as [number, number],
-      relatedPeople: ["徐光启", "马相伯"],
-      relatedEvents: ["1910年建成", "文革期间关闭", "1979年重新开放", "2013年大修完成"]
+      coordinates: [106.5692, 29.5628] as [number, number],
+      relatedPeople: ["法国传教士"],
+      relatedEvents: ["1900年建堂", "现代修复"]
     },
-    // 伊斯兰清真寺
     {
-      id: "8",
-      name: "西安大清真寺",
-      location: "陕西省西安市莲湖区",
+      id: "cq6",
+      name: "重庆清真寺",
+      location: "重庆市渝中区",
       religion: "islam",
-      establishedYear: 742,
+      establishedYear: 1850,
       status: "active",
-      description: "西安大清真寺位于陕西省西安市莲湖区化觉巷，始建于唐天宝元年（742年），是中国现存规模最大、保存最完整的伊斯兰教古建筑群之一，具有浓郁的中国传统建筑风格。",
+      description: "重庆清真寺位于重庆市渝中区，是重庆回族穆斯林的重要宗教活动场所。",
+      imageUrl: "https://images.unsplash.com/photo-1492321936769-b49830bc1d1e?w=800&h=600&fit=crop", 
+      coordinates: [106.5770, 29.5647] as [number, number],
+      relatedPeople: ["回族商人"],
+      relatedEvents: ["1850年建寺", "现代修缮"]
+    },
+    {
+      id: "cq7",
+      name: "重庆罗汉寺",
+      location: "重庆市渝中区",
+      religion: "buddhism",
+      establishedYear: 1000,
+      status: "active",
+      description: "罗汉寺位于重庆市渝中区民族路，始建于北宋治平年间，是重庆最古老的佛教寺院之一。",
       imageUrl: "https://images.unsplash.com/photo-1473177104440-ffee2f376098?w=800&h=600&fit=crop",
-      coordinates: [108.9415, 34.2636] as [number, number],
-      relatedPeople: ["赛典赤·赡思丁"],
-      relatedEvents: ["742年创建", "明清重修", "1956年修缮", "1988年对外开放"]
+      coordinates: [106.5692, 29.5647] as [number, number],
+      relatedPeople: ["智真法师"],
+      relatedEvents: ["1000年建寺", "明清重修", "现代保护"]
     },
     {
-      id: "9",
-      name: "喀什艾提尕尔清真寺",
-      location: "新疆维吾尔自治区喀什市",
-      religion: "islam",
-      establishedYear: 1442,
+      id: "cq8",
+      name: "重庆绍龙观",
+      location: "重庆市渝北区",
+      religion: "taoism",
+      establishedYear: 1368,
       status: "active",
-      description: "艾提尕尔清真寺位于新疆喀什市中心，始建于1442年，是新疆规模最大的清真寺，也是全国规模最大的清真寺之一，可同时容纳2万人做礼拜。",
+      description: "绍龙观位于重庆渝北区，是重庆地区重要的道教宫观之一。",
+      imageUrl: "https://images.unsplash.com/photo-1466442929976-97f336a657be?w=800&h=600&fit=crop",
+      coordinates: [106.6435, 29.7167] as [number, number],
+      relatedPeople: ["道教宗师"],
+      relatedEvents: ["1368年建观", "历代修缮"]
+    },
+    {
+      id: "cq9",
+      name: "重庆双桂堂",
+      location: "重庆市梁平区",
+      religion: "buddhism",
+      establishedYear: 1653,
+      status: "active",
+      description: "双桂堂位于重庆梁平区金带镇，由破山禅师创建，是西南地区著名的佛教寺院。",
       imageUrl: "https://images.unsplash.com/photo-1492321936769-b49830bc1d1e?w=800&h=600&fit=crop",
-      coordinates: [75.9877, 39.4677] as [number, number],
-      relatedPeople: ["莎车王后裔"],
-      relatedEvents: ["1442年建寺", "清代扩建", "现代修缮", "对外开放参观"]
+      coordinates: [107.8000, 30.6742] as [number, number],
+      relatedPeople: ["破山禅师"],
+      relatedEvents: ["1653年创建", "清代兴盛", "现代修复"]
     }
   ];
 
@@ -181,15 +177,19 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
     // Set access token
     mapboxgl.accessToken = mapboxToken;
 
-    // Initialize map
+    // Initialize map focused on Chongqing area
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: getMapboxStyle(mapStyle),
       center: [106.5805, 29.5647], // Chongqing center
-      zoom: zoom,
-      pitch: 45,
+      zoom: 9, // 更适合重庆市区的缩放级别
+      pitch: 0, // 减少倾斜角度
       bearing: 0,
-      antialias: true
+      antialias: true,
+      maxBounds: [
+        [104.0, 28.0], // 西南边界
+        [110.0, 32.0]  // 东北边界
+      ] // 限制地图范围在重庆周边
     });
 
     // Add navigation controls
@@ -277,12 +277,7 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
         e.stopPropagation();
         console.log('Marker clicked:', temple.name); // 调试信息
         onTempleSelect(temple);
-        // Fly to temple
-        map.current?.flyTo({
-          center: temple.coordinates,
-          zoom: 15,
-          duration: 1000
-        });
+        // 不自动飞行到寺庙位置，避免地图变化让人头晕
       });
 
       markers.current.push(marker);

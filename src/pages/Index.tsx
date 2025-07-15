@@ -85,6 +85,7 @@ const Index = () => {
           isMobile={isMobile}
           currentYear={currentYear}
           onYearChange={handleYearChange}
+          onTempleSelect={handleTempleSelect}
         />
         <div className="flex-1 flex flex-col relative">
           <MapView 

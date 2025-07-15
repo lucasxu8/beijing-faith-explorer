@@ -47,18 +47,18 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
   return (
     <div className={`
       ${isMobile 
-        ? 'fixed inset-x-0 bottom-0 z-50 max-h-[80vh] overflow-y-auto' 
-        : 'w-96 h-full overflow-y-auto'
+        ? 'fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-3xl shadow-2xl' 
+        : 'w-[28rem] h-full overflow-y-auto border-l-2'
       }
-      bg-card border-l border-border shadow-floating
+      bg-background border-border backdrop-blur-lg
     `}>
-      <Card className="border-0 shadow-none">
-        <CardHeader className="pb-4">
+      <Card className="border-0 shadow-none bg-transparent">
+        <CardHeader className="pb-6 px-6 pt-6">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-2xl">{religion.icon}</span>
-                <h2 className="text-xl font-bold text-foreground">{temple.name}</h2>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-3xl">{religion.icon}</span>
+                <h2 className="text-2xl font-bold text-foreground leading-tight">{temple.name}</h2>
               </div>
               <Badge 
                 variant="secondary" 
@@ -78,7 +78,7 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 px-6 pb-6">
           {/* Main Image */}
           <div className="aspect-video bg-muted rounded-lg overflow-hidden">
             <img 
