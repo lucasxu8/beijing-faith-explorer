@@ -28,7 +28,7 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
-  const [mapStyle, setMapStyle] = useState<'satellite' | 'streets' | 'outdoors'>('streets');
+  const [mapStyle, setMapStyle] = useState<'vintage' | 'terrain'>('vintage');
   const [zoom, setZoom] = useState(10);
   const [showClusters, setShowClusters] = useState(true);
   const [mapboxToken, setMapboxToken] = useState('');
@@ -147,12 +147,12 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
 
   const getMapboxStyle = (style: string) => {
     switch (style) {
-      case 'satellite':
-        return 'mapbox://styles/mapbox/satellite-streets-v12';
-      case 'outdoors':
+      case 'vintage':
+        return 'mapbox://styles/mapbox/light-v11'; // Clean, vintage feel
+      case 'terrain':
         return 'mapbox://styles/mapbox/outdoors-v12';
       default:
-        return 'mapbox://styles/mapbox/streets-v12';
+        return 'mapbox://styles/mapbox/light-v11'; // Default to clean vintage style
     }
   };
 
@@ -208,20 +208,20 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
     <div className="relative flex-1 h-full">
       {/* Mapbox Token Input */}
       {!mapboxToken && (
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center z-50">
-          <div className="floating-panel p-8 max-w-md w-full mx-4">
+        <div className="absolute inset-0 bg-background/95 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="glass-panel p-8 max-w-md w-full mx-4 rounded-2xl">
             <div className="text-center mb-6">
-              <MapPin className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">需要 Mapbox 访问令牌</h3>
+              <MapPin className="h-12 w-12 text-primary mx-auto mb-4" />
+              <h3 className="text-xl font-bold mb-2 golden-accent">需要 Mapbox 访问令牌</h3>
               <p className="text-muted-foreground text-sm">
-                请在 <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">mapbox.com</a> 获取您的公共访问令牌
+                请在 <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">mapbox.com</a> 获取您的公共访问令牌
               </p>
             </div>
             <div className="space-y-4">
               <input
                 type="text"
                 placeholder="pk.eyJ1IjoieW91ci11c2VybmFtZSIsImEiOiJjbGt..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 bg-background/50 border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                 onChange={(e) => setMapboxToken(e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
@@ -233,38 +233,38 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
       )}
 
       {/* Map Container */}
-      <div ref={mapContainer} className="w-full h-full rounded-xl overflow-hidden" />
+      <div ref={mapContainer} className="w-full h-full rounded-2xl overflow-hidden shadow-2xl" />
       
       {/* Map Controls */}
-      <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
+      <div className="absolute top-6 right-6 flex flex-col gap-3 z-10">
         <Button
           variant="outline"
           size="sm"
-          className="floating-panel h-10 w-10 p-0"
+          className="glass-panel h-12 w-12 p-0 rounded-xl border-0 hover:scale-105 transition-transform"
           onClick={() => {
             if (map.current) {
               map.current.zoomIn();
             }
           }}
         >
-          <ZoomIn className="h-4 w-4" />
+          <ZoomIn className="h-5 w-5" />
         </Button>
         <Button
           variant="outline"
           size="sm"
-          className="floating-panel h-10 w-10 p-0"
+          className="glass-panel h-12 w-12 p-0 rounded-xl border-0 hover:scale-105 transition-transform"
           onClick={() => {
             if (map.current) {
               map.current.zoomOut();
             }
           }}
         >
-          <ZoomOut className="h-4 w-4" />
+          <ZoomOut className="h-5 w-5" />
         </Button>
         <Button
           variant="outline"
           size="sm"
-          className="floating-panel h-10 w-10 p-0"
+          className="glass-panel h-12 w-12 p-0 rounded-xl border-0 hover:scale-105 transition-transform"
           onClick={() => {
             if (map.current) {
               map.current.flyTo({
@@ -275,41 +275,40 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
             }
           }}
         >
-          <Locate className="h-4 w-4" />
+          <Locate className="h-5 w-5" />
         </Button>
         <Button
           variant="outline"
           size="sm"
-          className="floating-panel h-10 w-10 p-0"
+          className="glass-panel h-12 w-12 p-0 rounded-xl border-0 hover:scale-105 transition-transform"
           onClick={() => {
             if (map.current) {
               map.current.resetNorth();
             }
           }}
         >
-          <Navigation className="h-4 w-4" />
+          <Navigation className="h-5 w-5" />
         </Button>
       </div>
 
       {/* Layer Controls */}
-      <div className="absolute top-4 left-4 z-10">
-        <div className="floating-panel p-4 space-y-3 min-w-[160px]">
-          <div className="flex items-center gap-2">
-            <Layers className="h-4 w-4 text-blue-500" />
-            <span className="text-sm font-medium">地图样式</span>
+      <div className="absolute top-6 left-6 z-10">
+        <div className="glass-panel p-5 space-y-4 min-w-[180px] rounded-2xl">
+          <div className="flex items-center gap-3">
+            <Layers className="h-5 w-5 text-primary" />
+            <span className="text-sm font-semibold golden-accent">地图样式</span>
           </div>
           
-          <div className="space-y-1">
+          <div className="space-y-2">
             {[
-              { key: 'streets', label: '街道地图' },
-              { key: 'satellite', label: '卫星图像' },
-              { key: 'outdoors', label: '户外地图' }
+              { key: 'vintage', label: '复古地图' },
+              { key: 'terrain', label: '地形图' }
             ].map((style) => (
               <Button
                 key={style.key}
                 variant={mapStyle === style.key ? "default" : "ghost"}
                 size="sm"
-                className="w-full justify-start text-xs"
+                className="w-full justify-start text-sm rounded-lg hover:scale-105 transition-transform"
                 onClick={() => {
                   setMapStyle(style.key as any);
                   if (map.current) {
@@ -325,36 +324,36 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
       </div>
 
       {/* Legend */}
-      <div className="absolute bottom-4 left-4 floating-panel p-4 z-10 max-w-xs">
-        <div className="text-sm font-medium mb-3">图例</div>
-        <div className="space-y-2">
+      <div className="absolute bottom-6 left-6 glass-panel p-5 z-10 max-w-xs rounded-2xl">
+        <div className="text-sm font-semibold mb-4 golden-accent">图例</div>
+        <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: getReligionColor('buddhism') }} />
-            <span className="text-sm">佛教寺庙</span>
+            <div className="w-5 h-5 rounded-full shadow-md" style={{ backgroundColor: getReligionColor('buddhism') }} />
+            <span className="text-sm font-medium">佛教寺庙</span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: getReligionColor('taoism') }} />
-            <span className="text-sm">道教宫观</span>
+            <div className="w-5 h-5 rounded-full shadow-md" style={{ backgroundColor: getReligionColor('taoism') }} />
+            <span className="text-sm font-medium">道教宫观</span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: getReligionColor('folk') }} />
-            <span className="text-sm">民间信仰</span>
+            <div className="w-5 h-5 rounded-full shadow-md" style={{ backgroundColor: getReligionColor('folk') }} />
+            <span className="text-sm font-medium">民间信仰</span>
           </div>
         </div>
         
-        <div className="mt-4 pt-3 border-t border-gray-200">
-          <div className="text-xs text-muted-foreground mb-2">规模等级</div>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-gray-300 border border-gray-400" />
+        <div className="mt-5 pt-4 border-t border-border">
+          <div className="text-xs font-semibold text-muted-foreground mb-3">规模等级</div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="w-4 h-4 rounded-full bg-muted border border-border shadow-sm" />
               <span className="text-xs">国家级 (16px)</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-gray-300 border border-gray-400" />
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full bg-muted border border-border shadow-sm" />
               <span className="text-xs">省级 (12px)</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-gray-300 border border-gray-400" />
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-muted border border-border shadow-sm" />
               <span className="text-xs">其他 (8-10px)</span>
             </div>
           </div>
@@ -362,14 +361,12 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
       </div>
 
       {/* Year Display */}
-      <div className="absolute bottom-4 right-4 floating-panel p-4 z-10">
-        <div className="text-center">
-          <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            {currentYear}
-          </div>
-          <div className="text-sm text-muted-foreground mt-1">
-            显示 {filteredTemples.length} 处宗教场所
-          </div>
+      <div className="absolute bottom-6 right-6 glass-panel p-6 z-10 rounded-2xl text-center">
+        <div className="text-3xl font-bold golden-accent mb-2">
+          {currentYear}
+        </div>
+        <div className="text-sm text-muted-foreground">
+          显示 <span className="font-semibold text-primary">{filteredTemples.length}</span> 处宗教场所
         </div>
       </div>
     </div>

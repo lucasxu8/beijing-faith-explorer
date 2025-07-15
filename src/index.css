@@ -6,49 +6,56 @@
 
 @layer base {
   :root {
-    /* Base colors */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    /* Elegant Design System - Light Mode */
+    --background: 50 20% 98%;
+    --foreground: 225 25% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 225 25% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+    --popover-foreground: 225 25% 12%;
+    --primary: 45 100% 65%;
+    --primary-foreground: 225 25% 12%;
+    --secondary: 50 20% 95%;
+    --secondary-foreground: 225 25% 12%;
+    --muted: 50 20% 94%;
+    --muted-foreground: 225 15% 50%;
+    --accent: 50 20% 92%;
+    --accent-foreground: 225 25% 12%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 50 20% 88%;
+    --input: 50 20% 88%;
+    --ring: 45 100% 65%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    /* Religion colors */
-    --buddhism: 11 100% 60%;
-    --taoism: 173 60% 55%;
-    --folk: 208 100% 47%;
+    /* Enhanced Design System */
+    --gradient-primary: linear-gradient(135deg, hsl(45 100% 65%), hsl(35 95% 60%));
+    --gradient-secondary: linear-gradient(135deg, hsl(0 0% 100%), hsl(50 20% 95%));
+    --gradient-accent: linear-gradient(180deg, hsl(50 20% 92% / 0.8), hsl(0 0% 100% / 0.95));
+    --gradient-dark: linear-gradient(135deg, hsl(225 25% 8%), hsl(225 25% 12%));
     
-    /* Modern gradients */
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-hero: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --gradient-map: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --shadow-elegant: 0 25px 50px -12px hsl(225 25% 12% / 0.12);
+    --shadow-glow: 0 0 40px hsl(45 100% 65% / 0.15);
+    --shadow-inset: inset 0 1px 0 hsl(0 0% 100% / 0.8);
+    --shadow-sharp: 0 4px 20px -2px hsl(225 25% 12% / 0.08);
     
-    /* Shadows */
-    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --border-subtle: hsl(50 20% 85% / 0.8);
+    --border-accent: hsl(45 100% 65% / 0.2);
+    --border-glass: hsl(0 0% 100% / 0.15);
+    
+    --backdrop-blur: blur(20px) saturate(180%);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    /* Religion colors - refined palette */
+    --buddhism: 18 85% 60%;
+    --taoism: 174 65% 55%; 
+    --folk: 208 70% 60%;
 
     --sidebar-background: 0 0% 98%;
 
@@ -68,30 +75,50 @@
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    /* Elegant Design System - Dark Mode */
+    --background: 225 25% 8%;
+    --foreground: 210 20% 95%;
+    --card: 225 25% 12%;
+    --card-foreground: 210 20% 95%;
+    --popover: 225 25% 12%;
+    --popover-foreground: 210 20% 95%;
+    --primary: 45 100% 70%;
+    --primary-foreground: 225 25% 12%;
+    --secondary: 225 25% 18%;
+    --secondary-foreground: 210 20% 95%;
+    --muted: 225 25% 16%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 225 25% 20%;
+    --accent-foreground: 210 20% 95%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 20% 95%;
+    --border: 225 25% 20%;
+    --input: 225 25% 16%;
+    --ring: 45 100% 70%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    
+    /* Enhanced Design System - Dark */
+    --gradient-primary: linear-gradient(135deg, hsl(45 100% 70%), hsl(35 100% 65%));
+    --gradient-secondary: linear-gradient(135deg, hsl(225 25% 12%), hsl(225 25% 18%));
+    --gradient-accent: linear-gradient(180deg, hsl(225 25% 20% / 0.8), hsl(225 25% 12% / 0.9));
+    
+    --shadow-elegant: 0 25px 50px -12px hsl(225 25% 4% / 0.6);
+    --shadow-glow: 0 0 40px hsl(45 100% 70% / 0.2);
+    --shadow-inset: inset 0 1px 0 hsl(225 25% 25% / 0.5);
+    --shadow-sharp: 0 4px 20px -2px hsl(225 25% 4% / 0.4);
+    
+    --border-subtle: hsl(225 25% 25% / 0.5);
+    --border-accent: hsl(45 100% 70% / 0.3);
+    --border-glass: hsl(225 25% 25% / 0.3);
+    
+    /* Religion colors - dark mode */
+    --buddhism: 18 85% 65%;
+    --taoism: 174 65% 60%; 
+    --folk: 208 70% 65%;
 
     --sidebar-background: 30 15% 8%;
     --sidebar-foreground: 32 25% 95%;
@@ -116,16 +143,62 @@
 }
 
 @layer components {
-  .glassmorphism {
-    @apply bg-white/20 backdrop-blur-lg border border-white/30;
+  .glass-panel {
+    background: var(--gradient-accent);
+    backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--border-glass);
+    box-shadow: var(--shadow-elegant), var(--shadow-inset);
+    transition: var(--transition-smooth);
   }
-  
-  .modern-card {
-    @apply bg-white rounded-2xl shadow-lg border border-gray-100/50;
+
+  .glass-panel:hover {
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-glow), var(--shadow-inset);
+    transform: translateY(-2px);
   }
-  
+
   .floating-panel {
-    @apply bg-white/95 backdrop-blur-xl rounded-xl border border-white/20 shadow-xl;
+    background: var(--gradient-accent);
+    backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--border-glass);
+    box-shadow: var(--shadow-sharp);
+    transition: var(--transition-smooth);
+  }
+
+  .floating-panel:hover {
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .golden-accent {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+  }
+
+  .elegant-card {
+    @apply rounded-2xl;
+    background: hsl(var(--card));
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-elegant);
+    transition: var(--transition-smooth);
+  }
+
+  .elegant-card:hover {
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-4px);
+  }
+
+  .smooth-button {
+    transition: var(--transition-spring);
+    border-radius: 0.75rem;
+  }
+
+  .smooth-button:hover {
+    transform: translateY(-2px) scale(1.02);
   }
 }
 
