@@ -249,22 +249,33 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
       el.style.cursor = 'pointer';
       el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
       el.style.transition = 'all 0.3s ease';
+      el.style.position = 'relative';
+      el.style.zIndex = '10';
+
+      // 增强点击区域
+      el.style.minWidth = '20px';
+      el.style.minHeight = '20px';
+      el.style.padding = '3px';
 
       el.addEventListener('mouseenter', () => {
-        el.style.transform = 'scale(1.2)';
+        el.style.transform = 'scale(1.3)';
         el.style.zIndex = '1000';
+        el.style.boxShadow = '0 4px 16px rgba(0,0,0,0.4)';
       });
 
       el.addEventListener('mouseleave', () => {
         el.style.transform = 'scale(1)';
-        el.style.zIndex = 'auto';
+        el.style.zIndex = '10';
+        el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
       });
 
       const marker = new mapboxgl.Marker(el)
         .setLngLat(temple.coordinates)
         .addTo(map.current!);
 
-      marker.getElement().addEventListener('click', () => {
+      marker.getElement().addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log('Marker clicked:', temple.name); // 调试信息
         onTempleSelect(temple);
         // Fly to temple
         map.current?.flyTo({

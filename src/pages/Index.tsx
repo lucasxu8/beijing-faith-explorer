@@ -4,6 +4,7 @@ import { FilterPanel } from "@/components/FilterPanel";
 import { MapView } from "@/components/MapView";
 import { TimeSlider } from "@/components/TimeSlider";
 import { DetailPanel } from "@/components/DetailPanel";
+import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Temple {
@@ -26,6 +27,7 @@ const Index = () => {
   const [selectedTemple, setSelectedTemple] = useState<Temple | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isTimeSliderVisible, setIsTimeSliderVisible] = useState(true);
   
   const isMobile = useIsMobile();
 
@@ -47,6 +49,7 @@ const Index = () => {
   }, [isPlaying]);
 
   const handleTempleSelect = (temple: Temple) => {
+    console.log('Temple selected:', temple); // 调试信息
     setSelectedTemple(temple);
     setIsDetailOpen(true);
     // Close filter panel on mobile when selecting temple
@@ -84,15 +87,32 @@ const Index = () => {
         <div className="flex-1 flex flex-col relative">
           <MapView 
             currentYear={currentYear}
-            onTempleSelect={setSelectedTemple}
+            onTempleSelect={handleTempleSelect}
             selectedTemple={selectedTemple}
           />
-          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
-            <TimeSlider 
-              currentYear={currentYear}
-              onYearChange={setCurrentYear}
-            />
+          
+          {/* 时间轴显示/隐藏按钮 */}
+          <div className="absolute bottom-24 right-6 z-20">
+            <Button
+              variant="outline"
+              size="sm"
+              className="glass-panel h-12 w-12 p-0 rounded-xl border-0 hover:scale-105 transition-transform"
+              onClick={() => setIsTimeSliderVisible(!isTimeSliderVisible)}
+              title={isTimeSliderVisible ? "隐藏时间轴" : "显示时间轴"}
+            >
+              {isTimeSliderVisible ? "⏰" : "📅"}
+            </Button>
           </div>
+
+          {/* 时间轴控制 */}
+          {isTimeSliderVisible && (
+            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
+              <TimeSlider 
+                currentYear={currentYear}
+                onYearChange={setCurrentYear}
+              />
+            </div>
+          )}
         </div>
         {selectedTemple && (
           <DetailPanel 
