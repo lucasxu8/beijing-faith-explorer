@@ -22,9 +22,10 @@ interface MapViewProps {
   currentYear: number;
   onTempleSelect: (temple: Temple) => void;
   selectedTemple: Temple | null;
+  selectedReligions?: string[];
 }
 
-export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapViewProps) => {
+export const MapView = ({ currentYear, onTempleSelect, selectedTemple, selectedReligions = [] }: MapViewProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
@@ -154,7 +155,11 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
     }
   ];
 
-  const filteredTemples = temples.filter(temple => temple.establishedYear <= currentYear);
+  const filteredTemples = temples.filter(temple => {
+    const yearFilter = temple.establishedYear <= currentYear;
+    const religionFilter = selectedReligions.length === 0 || selectedReligions.includes(temple.religion);
+    return yearFilter && religionFilter;
+  });
 
   const getReligionColor = (religion: string) => {
     switch (religion) {
@@ -227,7 +232,7 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
     if (map.current) {
       updateMarkers();
     }
-  }, [currentYear, filteredTemples]);
+  }, [currentYear, selectedReligions]);
 
   const getMapboxStyle = (style: string) => {
     switch (style) {

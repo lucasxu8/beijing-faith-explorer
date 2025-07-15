@@ -6,13 +6,16 @@ import { Slider } from "@/components/ui/slider";
 interface TimeSliderProps {
   currentYear: number;
   onYearChange: (year: number) => void;
+  isPlaying?: boolean;
+  onPlayToggle?: () => void;
 }
 
 export const TimeSlider = ({ 
   currentYear, 
-  onYearChange
+  onYearChange,
+  isPlaying = false,
+  onPlayToggle
 }: TimeSliderProps) => {
-  const [isPlaying, setIsPlaying] = useState(false);
   const minYear = 618; // Tang Dynasty
   const maxYear = 2024; // Current year
   
@@ -34,7 +37,7 @@ export const TimeSlider = ({
   };
 
   return (
-    <div className="floating-panel p-6 mx-4 max-w-4xl w-full">
+    <div className="glass-panel p-6 mx-4 max-w-4xl w-full rounded-2xl shadow-2xl">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Clock className="h-5 w-5 text-blue-500" />
@@ -44,7 +47,7 @@ export const TimeSlider = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={onPlayToggle}
             className="h-8 w-8 p-0"
           >
             {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}

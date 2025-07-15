@@ -28,6 +28,7 @@ const Index = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isTimeSliderVisible, setIsTimeSliderVisible] = useState(true);
+  const [selectedReligions, setSelectedReligions] = useState<string[]>([]);
   
   const isMobile = useIsMobile();
 
@@ -86,14 +87,28 @@ const Index = () => {
           currentYear={currentYear}
           onYearChange={handleYearChange}
           onTempleSelect={handleTempleSelect}
+          selectedReligions={selectedReligions}
+          onReligionFilter={setSelectedReligions}
         />
         <div className="flex-1 flex flex-col relative">
           <MapView 
             currentYear={currentYear}
             onTempleSelect={handleTempleSelect}
             selectedTemple={selectedTemple}
+            selectedReligions={selectedReligions}
           />
           
+          {/* 时间轴控制器 */}
+          {isTimeSliderVisible && (
+            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
+              <TimeSlider 
+                currentYear={currentYear}
+                onYearChange={handleYearChange}
+                isPlaying={isPlaying}
+                onPlayToggle={handlePlayToggle}
+              />
+            </div>
+          )}
         </div>
         {selectedTemple && (
           <DetailPanel 

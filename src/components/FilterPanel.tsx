@@ -35,9 +35,11 @@ interface FilterPanelProps {
   currentYear: number;
   onYearChange: (year: number) => void;
   onTempleSelect?: (temple: Temple) => void;
+  selectedReligions?: string[];
+  onReligionFilter?: (religions: string[]) => void;
 }
 
-export const FilterPanel = ({ isOpen, onToggle, isMobile, currentYear, onYearChange, onTempleSelect }: FilterPanelProps) => {
+export const FilterPanel = ({ isOpen, onToggle, isMobile, currentYear, onYearChange, onTempleSelect, selectedReligions = [], onReligionFilter }: FilterPanelProps) => {
   const [expandedSections, setExpandedSections] = useState({
     timeControl: true,
     templeList: true,
@@ -192,6 +194,18 @@ export const FilterPanel = ({ isOpen, onToggle, isMobile, currentYear, onYearCha
     }));
   };
 
+  const handleReligionChange = (religionId: string, checked: boolean) => {
+    if (!onReligionFilter) return;
+    
+    let newSelected;
+    if (checked) {
+      newSelected = [...selectedReligions, religionId];
+    } else {
+      newSelected = selectedReligions.filter(id => id !== religionId);
+    }
+    onReligionFilter(newSelected);
+  };
+
   const FilterSection = ({ 
     title, 
     options, 
@@ -223,7 +237,15 @@ export const FilterPanel = ({ isOpen, onToggle, isMobile, currentYear, onYearCha
       <CollapsibleContent className="space-y-2 pt-2">
         {options.map((option) => (
           <div key={option.id} className="flex items-center space-x-3 px-2">
-            <Checkbox id={option.id} />
+            <Checkbox 
+              id={option.id} 
+              checked={sectionKey === 'religion' ? selectedReligions.includes(option.id) : false}
+              onCheckedChange={(checked) => {
+                if (sectionKey === 'religion') {
+                  handleReligionChange(option.id, !!checked);
+                }
+              }}
+            />
             {showColors && option.color && (
               <div className={`w-3 h-3 rounded-full ${option.color}`} />
             )}
@@ -375,7 +397,11 @@ export const FilterPanel = ({ isOpen, onToggle, isMobile, currentYear, onYearCha
         />
         
         <div className="pt-4 border-t border-border">
-          <Button variant="outline" className="w-full">
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => onReligionFilter?.([])}
+          >
             清空所有筛选
           </Button>
         </div>
