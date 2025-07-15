@@ -8,9 +8,8 @@ interface Temple {
   id: string;
   name: string;
   location: string;
-  religion: "buddhism" | "taoism" | "folk";
+  religion: "buddhism" | "taoism" | "catholic" | "islam";
   establishedYear: number;
-  scale: "national" | "provincial" | "municipal" | "district";
   status: "active" | "renovation" | "ruins";
   description: string;
   imageUrl: string;
@@ -32,14 +31,8 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
   const religionConfig = {
     buddhism: { label: "佛教", color: "bg-buddhism", icon: "🏯" },
     taoism: { label: "道教", color: "bg-taoism", icon: "⛩️" },
-    folk: { label: "民间信仰", color: "bg-folk", icon: "🏛️" }
-  };
-
-  const scaleConfig = {
-    national: { label: "国家级文物保护单位", color: "bg-national" },
-    provincial: { label: "省级文物保护单位", color: "bg-provincial" },
-    municipal: { label: "市级文物保护单位", color: "bg-municipal" },
-    district: { label: "区县级文物保护单位", color: "bg-district" }
+    catholic: { label: "天主教", color: "bg-catholic", icon: "⛪" },
+    islam: { label: "伊斯兰教", color: "bg-islam", icon: "🕌" }
   };
 
   const statusConfig = {
@@ -49,7 +42,6 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
   };
 
   const religion = religionConfig[temple.religion];
-  const scale = scaleConfig[temple.scale];
   const status = statusConfig[temple.status];
 
   return (
@@ -117,12 +109,6 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
               </span>
             </div>
             
-            <div className="flex items-center gap-2 text-sm">
-              <Building className="h-4 w-4 text-muted-foreground" />
-              <Badge variant="outline" className={`${scale.color} text-white border-0`}>
-                {scale.label}
-              </Badge>
-            </div>
 
             <div className="flex items-center gap-2 text-sm">
               <div className={`w-3 h-3 rounded-full ${status.color}`} />

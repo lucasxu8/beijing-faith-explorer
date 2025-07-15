@@ -22,32 +22,25 @@ export const FilterPanel = ({ isOpen, onToggle, isMobile }: FilterPanelProps) =>
   const [expandedSections, setExpandedSections] = useState({
     religion: true,
     period: true,
-    scale: false,
     status: false,
   });
 
   const religions: FilterOption[] = [
-    { id: "buddhism", label: "佛教", count: 156, color: "bg-buddhism" },
-    { id: "taoism", label: "道教", count: 89, color: "bg-taoism" },
-    { id: "folk", label: "民间信仰", count: 67, color: "bg-folk" },
+    { id: "buddhism", label: "佛教", count: 3, color: "bg-buddhism" },
+    { id: "taoism", label: "道教", count: 2, color: "bg-taoism" },
+    { id: "catholic", label: "天主教", count: 2, color: "bg-catholic" },
+    { id: "islam", label: "伊斯兰教", count: 2, color: "bg-islam" },
   ];
 
   const periods: FilterOption[] = [
-    { id: "ancient", label: "古代 (618-1911)", count: 198 },
-    { id: "modern", label: "近现代 (1912-2024)", count: 114 },
-  ];
-
-  const scales: FilterOption[] = [
-    { id: "national", label: "国家级", count: 12, color: "bg-national" },
-    { id: "provincial", label: "省级", count: 34, color: "bg-provincial" },
-    { id: "municipal", label: "市级", count: 78, color: "bg-municipal" },
-    { id: "district", label: "区县级", count: 188, color: "bg-district" },
+    { id: "ancient", label: "古代 (618-1911)", count: 7 },
+    { id: "modern", label: "近现代 (1912-2024)", count: 2 },
   ];
 
   const statuses: FilterOption[] = [
-    { id: "active", label: "正常开放", count: 245 },
-    { id: "renovation", label: "修缮中", count: 35 },
-    { id: "ruins", label: "遗址", count: 32 },
+    { id: "active", label: "正常开放", count: 9 },
+    { id: "renovation", label: "修缮中", count: 0 },
+    { id: "ruins", label: "遗址", count: 0 },
   ];
 
   const toggleSection = (section: string) => {
@@ -146,13 +139,6 @@ export const FilterPanel = ({ isOpen, onToggle, isMobile }: FilterPanelProps) =>
           title="建立时期"
           options={periods}
           sectionKey="period"
-        />
-        
-        <FilterSection
-          title="规模等级"
-          options={scales}
-          sectionKey="scale"
-          showColors={true}
         />
         
         <FilterSection

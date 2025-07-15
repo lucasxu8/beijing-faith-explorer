@@ -7,9 +7,8 @@ interface Temple {
   id: string;
   name: string;
   location: string;
-  religion: "buddhism" | "taoism" | "folk";
+  religion: "buddhism" | "taoism" | "catholic" | "islam";
   establishedYear: number;
-  scale: "national" | "provincial" | "municipal" | "district";
   status: "active" | "renovation" | "ruins";
   description: string;
   imageUrl: string;
@@ -33,49 +32,128 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
   const [showClusters, setShowClusters] = useState(true);
   const [mapboxToken, setMapboxToken] = useState('');
 
-  // Mock temple data - in real app this would come from your backend
+  // Real temple data for Chinese religious sites
   const temples: Temple[] = [
+    // 佛教寺庙
     {
       id: "1",
-      name: "华岩寺",
-      location: "南岸区华岩镇",
+      name: "少林寺",
+      location: "河南省登封市",
       religion: "buddhism",
-      establishedYear: 1825,
-      scale: "national",
+      establishedYear: 495,
       status: "active",
-      description: "华岩寺位于重庆市南岸区华岩镇，始建于清道光五年（1825年），是重庆市区最大的佛教寺院之一。寺院建筑宏伟，香火旺盛，为国家级文物保护单位。",
-      imageUrl: "/placeholder-temple.jpg",
-      coordinates: [106.4817, 29.5016] as [number, number],
-      relatedPeople: ["慈云老和尚", "太虚大师"],
-      relatedEvents: ["1825年建寺", "1980年恢复开放", "2001年扩建"]
+      description: "少林寺位于河南省登封市嵩山少室山五乳峰下，始建于北魏太和十九年（495年），是中国佛教禅宗祖庭和中国功夫的发源地，有\"禅宗祖庭，功夫圣地\"之称。",
+      imageUrl: "https://images.unsplash.com/photo-1473177104440-ffee2f376098?w=800&h=600&fit=crop",
+      coordinates: [113.0368, 34.5097] as [number, number],
+      relatedPeople: ["达摩祖师", "慧能大师", "释永信"],
+      relatedEvents: ["495年建寺", "明清重修", "1982年对外开放", "2010年申遗成功"]
     },
     {
       id: "2", 
-      name: "罗汉寺",
-      location: "渝中区罗汉寺街",
+      name: "灵隐寺",
+      location: "浙江省杭州市",
       religion: "buddhism",
-      establishedYear: 1036,
-      scale: "municipal",
+      establishedYear: 328,
       status: "active",
-      description: "罗汉寺始建于北宋治平年间（1036年），位于重庆市渝中区。寺内供奉五百罗汉，是重庆主城区历史最悠久的佛寺之一。",
-      imageUrl: "/placeholder-temple.jpg",
-      coordinates: [106.5805, 29.5647] as [number, number],
-      relatedPeople: ["无际大师"],
-      relatedEvents: ["1036年建寺", "明代重修", "现代修缮"]
+      description: "灵隐寺位于杭州市西湖西北面，始建于东晋咸和三年（328年），是江南著名古刹之一。寺内建筑雄伟，佛像庄严，香火旺盛，有\"江南禅宗五山\"之一的美誉。",
+      imageUrl: "https://images.unsplash.com/photo-1466442929976-97f336a657be?w=800&h=600&fit=crop",
+      coordinates: [120.0999, 30.2417] as [number, number],
+      relatedPeople: ["慧理禅师", "济公活佛"],
+      relatedEvents: ["328年建寺", "五代重建", "明清扩建", "现代修复"]
     },
     {
       id: "3",
-      name: "老君洞",
-      location: "南岸区黄桷垭",
-      religion: "taoism", 
-      establishedYear: 1400,
-      scale: "provincial",
+      name: "法门寺",
+      location: "陕西省宝鸡市扶风县",
+      religion: "buddhism",
+      establishedYear: 220,
       status: "active",
-      description: "老君洞道观建于明代，位于南岸区黄桷垭，是重庆主要的道教活动场所。洞内供奉太上老君，环境清幽，是道教信众朝拜之地。",
-      imageUrl: "/placeholder-temple.jpg",
-      coordinates: [106.6188, 29.5155] as [number, number],
-      relatedPeople: ["张三丰"],
-      relatedEvents: ["明代建观", "抗战时期重修"]
+      description: "法门寺位于陕西省宝鸡市扶风县，始建于东汉末年，素有\"关中塔庙始祖\"之称。因安置释迦牟尼佛指骨舍利而成为举国仰望的佛教圣地。",
+      imageUrl: "https://images.unsplash.com/photo-1492321936769-b49830bc1d1e?w=800&h=600&fit=crop",
+      coordinates: [107.9006, 34.4350] as [number, number],
+      relatedPeople: ["玄奘法师", "不空法师"],
+      relatedEvents: ["220年建寺", "唐代重修", "1987年发现地宫", "2009年新建合十舍利塔"]
+    },
+    // 道教宫观
+    {
+      id: "4",
+      name: "武当山金殿",
+      location: "湖北省十堰市丹江口市",
+      religion: "taoism", 
+      establishedYear: 1416,
+      status: "active",
+      description: "武当山金殿位于湖北省十堰市丹江口市武当山天柱峰顶，建于明永乐十四年（1416年），是武当山的最高胜境，供奉真武大帝，是中国道教的重要圣地。",
+      imageUrl: "https://images.unsplash.com/photo-1466442929976-97f336a657be?w=800&h=600&fit=crop",
+      coordinates: [111.0040, 32.6656] as [number, number],
+      relatedPeople: ["张三丰", "明成祖朱棣"],
+      relatedEvents: ["1416年建金殿", "明代全盛时期", "1994年列入世界遗产", "现代修缮保护"]
+    },
+    {
+      id: "5",
+      name: "青城山天师洞",
+      location: "四川省成都市都江堰市",
+      religion: "taoism",
+      establishedYear: 143,
+      status: "active",
+      description: "青城山天师洞位于四川省成都市都江堰市，是道教发源地之一，始建于东汉顺帝汉安二年（143年）。青城山素有\"青城天下幽\"之美誉，是中国道教的重要发祥地。",
+      imageUrl: "https://images.unsplash.com/photo-1473177104440-ffee2f376098?w=800&h=600&fit=crop",
+      coordinates: [103.5712, 30.9006] as [number, number],
+      relatedPeople: ["张道陵天师", "张鲁"],
+      relatedEvents: ["143年创教", "唐宋兴盛", "2000年申遗成功", "现代旅游开发"]
+    },
+    // 天主教堂
+    {
+      id: "6",
+      name: "北京东堂（王府井天主堂）",
+      location: "北京市东城区王府井大街",
+      religion: "catholic",
+      establishedYear: 1655,
+      status: "active",
+      description: "北京东堂位于北京市东城区王府井大街，建于清顺治十二年（1655年），是北京最古老的天主教堂之一。教堂建筑融合了中西方文化特色，是中国天主教的重要场所。",
+      imageUrl: "https://images.unsplash.com/photo-1492321936769-b49830bc1d1e?w=800&h=600&fit=crop",
+      coordinates: [116.4108, 39.9139] as [number, number],
+      relatedPeople: ["利玛窦", "汤若望", "南怀仁"],
+      relatedEvents: ["1655年建堂", "1720年重建", "1904年扩建", "现代修复开放"]
+    },
+    {
+      id: "7",
+      name: "上海徐家汇天主教堂",
+      location: "上海市徐汇区蒲西路",
+      religion: "catholic",
+      establishedYear: 1910,
+      status: "active",
+      description: "上海徐家汇天主教堂位于上海市徐汇区，建于1910年，是上海最大的天主教堂，也是远东最大的哥特式建筑之一，有\"东方巴黎圣母院\"之美誉。",
+      imageUrl: "https://images.unsplash.com/photo-1466442929976-97f336a657be?w=800&h=600&fit=crop",
+      coordinates: [121.4378, 31.1956] as [number, number],
+      relatedPeople: ["徐光启", "马相伯"],
+      relatedEvents: ["1910年建成", "文革期间关闭", "1979年重新开放", "2013年大修完成"]
+    },
+    // 伊斯兰清真寺
+    {
+      id: "8",
+      name: "西安大清真寺",
+      location: "陕西省西安市莲湖区",
+      religion: "islam",
+      establishedYear: 742,
+      status: "active",
+      description: "西安大清真寺位于陕西省西安市莲湖区化觉巷，始建于唐天宝元年（742年），是中国现存规模最大、保存最完整的伊斯兰教古建筑群之一，具有浓郁的中国传统建筑风格。",
+      imageUrl: "https://images.unsplash.com/photo-1473177104440-ffee2f376098?w=800&h=600&fit=crop",
+      coordinates: [108.9415, 34.2636] as [number, number],
+      relatedPeople: ["赛典赤·赡思丁"],
+      relatedEvents: ["742年创建", "明清重修", "1956年修缮", "1988年对外开放"]
+    },
+    {
+      id: "9",
+      name: "喀什艾提尕尔清真寺",
+      location: "新疆维吾尔自治区喀什市",
+      religion: "islam",
+      establishedYear: 1442,
+      status: "active",
+      description: "艾提尕尔清真寺位于新疆喀什市中心，始建于1442年，是新疆规模最大的清真寺，也是全国规模最大的清真寺之一，可同时容纳2万人做礼拜。",
+      imageUrl: "https://images.unsplash.com/photo-1492321936769-b49830bc1d1e?w=800&h=600&fit=crop",
+      coordinates: [75.9877, 39.4677] as [number, number],
+      relatedPeople: ["莎车王后裔"],
+      relatedEvents: ["1442年建寺", "清代扩建", "现代修缮", "对外开放参观"]
     }
   ];
 
@@ -85,19 +163,15 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
     switch (religion) {
       case 'buddhism': return '#FF6B35';
       case 'taoism': return '#4ECDC4';
-      case 'folk': return '#45B7D1';
+      case 'catholic': return '#9B59B6';
+      case 'islam': return '#2ECC71';
       default: return '#8B5A3C';
     }
   };
 
-  const getScaleSize = (scale: string) => {
-    switch (scale) {
-      case 'national': return 16;
-      case 'provincial': return 12;
-      case 'municipal': return 10;
-      case 'district': return 8;
-      default: return 8;
-    }
+  const getMarkerSize = (religion: string) => {
+    // All markers same size for simplicity
+    return 14;
   };
 
   // Initialize Mapbox map
@@ -167,8 +241,8 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
     filteredTemples.forEach((temple) => {
       const el = document.createElement('div');
       el.className = 'temple-marker';
-      el.style.width = `${getScaleSize(temple.scale)}px`;
-      el.style.height = `${getScaleSize(temple.scale)}px`;
+      el.style.width = `${getMarkerSize(temple.religion)}px`;
+      el.style.height = `${getMarkerSize(temple.religion)}px`;
       el.style.backgroundColor = getReligionColor(temple.religion);
       el.style.border = '2px solid white';
       el.style.borderRadius = '50%';
@@ -336,26 +410,12 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
             <span className="text-sm font-medium">道教宫观</span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-5 h-5 rounded-full shadow-md" style={{ backgroundColor: getReligionColor('folk') }} />
-            <span className="text-sm font-medium">民间信仰</span>
+            <div className="w-5 h-5 rounded-full shadow-md" style={{ backgroundColor: getReligionColor('catholic') }} />
+            <span className="text-sm font-medium">天主教堂</span>
           </div>
-        </div>
-        
-        <div className="mt-5 pt-4 border-t border-border">
-          <div className="text-xs font-semibold text-muted-foreground mb-3">规模等级</div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 rounded-full bg-muted border border-border shadow-sm" />
-              <span className="text-xs">国家级 (16px)</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-muted border border-border shadow-sm" />
-              <span className="text-xs">省级 (12px)</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-muted border border-border shadow-sm" />
-              <span className="text-xs">其他 (8-10px)</span>
-            </div>
+          <div className="flex items-center gap-3">
+            <div className="w-5 h-5 rounded-full shadow-md" style={{ backgroundColor: getReligionColor('islam') }} />
+            <span className="text-sm font-medium">伊斯兰清真寺</span>
           </div>
         </div>
       </div>

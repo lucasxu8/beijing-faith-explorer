@@ -55,7 +55,8 @@
     /* Religion colors - refined palette */
     --buddhism: 18 85% 60%;
     --taoism: 174 65% 55%; 
-    --folk: 208 70% 60%;
+    --catholic: 261 51% 59%;
+    --islam: 142 69% 58%;
 
     --sidebar-background: 0 0% 98%;
 
@@ -118,7 +119,8 @@
     /* Religion colors - dark mode */
     --buddhism: 18 85% 65%;
     --taoism: 174 65% 60%; 
-    --folk: 208 70% 65%;
+    --catholic: 261 51% 65%;
+    --islam: 142 69% 65%;
 
     --sidebar-background: 30 15% 8%;
     --sidebar-foreground: 32 25% 95%;

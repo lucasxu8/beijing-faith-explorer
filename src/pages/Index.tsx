@@ -10,9 +10,8 @@ interface Temple {
   id: string;
   name: string;
   location: string;
-  religion: "buddhism" | "taoism" | "folk";
+  religion: "buddhism" | "taoism" | "catholic" | "islam";
   establishedYear: number;
-  scale: "national" | "provincial" | "municipal" | "district";
   status: "active" | "renovation" | "ruins";
   description: string;
   imageUrl: string;
