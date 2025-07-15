@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Layers, ZoomIn, ZoomOut, Locate, RotateCcw } from "lucide-react";
+import { Layers, ZoomIn, ZoomOut, Locate, RotateCcw, Navigation, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import mapboxgl from 'mapbox-gl';
 
 interface Temple {
   id: string;
@@ -25,9 +26,12 @@ interface MapViewProps {
 
 export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapViewProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const [mapStyle, setMapStyle] = useState<'satellite' | 'historical' | 'terrain'>('satellite');
+  const map = useRef<mapboxgl.Map | null>(null);
+  const markers = useRef<mapboxgl.Marker[]>([]);
+  const [mapStyle, setMapStyle] = useState<'satellite' | 'streets' | 'outdoors'>('streets');
   const [zoom, setZoom] = useState(10);
   const [showClusters, setShowClusters] = useState(true);
+  const [mapboxToken, setMapboxToken] = useState('');
 
   // Mock temple data - in real app this would come from your backend
   const temples: Temple[] = [
@@ -96,112 +100,222 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
     }
   };
 
+  // Initialize Mapbox map
   useEffect(() => {
-    if (!mapContainer.current) return;
+    if (!mapContainer.current || !mapboxToken) return;
 
-    // In a real implementation, this would initialize Mapbox GL JS
-    // For now, we'll create a mock map interface
-    const mockMapElement = document.createElement('div');
-    mockMapElement.className = 'w-full h-full bg-gradient-map rounded-lg flex items-center justify-center relative overflow-hidden';
-    mockMapElement.innerHTML = `
-      <div class="absolute inset-0 bg-gradient-to-br from-teal-50 to-blue-100"></div>
-      <div class="relative z-10 text-center">
-        <div class="text-2xl font-bold text-primary mb-2">重庆信仰地图</div>
-        <div class="text-muted-foreground mb-4">显示 ${filteredTemples.length} 个宗教场所</div>
-        <div class="text-sm text-muted-foreground">当前时间: ${currentYear}年</div>
-      </div>
-    `;
+    // Set access token
+    mapboxgl.accessToken = mapboxToken;
 
-    // Add temple markers
-    filteredTemples.forEach((temple, index) => {
-      const marker = document.createElement('div');
-      marker.className = 'absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-110';
-      marker.style.left = `${30 + (index % 3) * 20}%`;
-      marker.style.top = `${40 + Math.floor(index / 3) * 15}%`;
-      marker.style.width = `${getScaleSize(temple.scale)}px`;
-      marker.style.height = `${getScaleSize(temple.scale)}px`;
-      marker.style.backgroundColor = getReligionColor(temple.religion);
-      marker.style.borderRadius = '50%';
-      marker.style.border = '2px solid white';
-      marker.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
-      
-      marker.addEventListener('click', () => onTempleSelect(temple));
-      
-      // Add tooltip
-      marker.title = `${temple.name} (${temple.establishedYear}年)`;
-      
-      mockMapElement.appendChild(marker);
+    // Initialize map
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: getMapboxStyle(mapStyle),
+      center: [106.5805, 29.5647], // Chongqing center
+      zoom: zoom,
+      pitch: 45,
+      bearing: 0,
+      antialias: true
     });
 
-    mapContainer.current.appendChild(mockMapElement);
+    // Add navigation controls
+    map.current.addControl(
+      new mapboxgl.NavigationControl({
+        visualizePitch: true,
+        showZoom: true,
+        showCompass: true
+      }),
+      'top-right'
+    );
+
+    // Add markers for temples
+    updateMarkers();
 
     return () => {
-      if (mapContainer.current) {
-        mapContainer.current.innerHTML = '';
-      }
+      markers.current.forEach(marker => marker.remove());
+      markers.current = [];
+      map.current?.remove();
     };
-  }, [currentYear, filteredTemples, onTempleSelect]);
+  }, [mapboxToken, mapStyle]);
+
+  // Update markers when temples or year changes
+  useEffect(() => {
+    if (map.current) {
+      updateMarkers();
+    }
+  }, [currentYear, filteredTemples]);
+
+  const getMapboxStyle = (style: string) => {
+    switch (style) {
+      case 'satellite':
+        return 'mapbox://styles/mapbox/satellite-streets-v12';
+      case 'outdoors':
+        return 'mapbox://styles/mapbox/outdoors-v12';
+      default:
+        return 'mapbox://styles/mapbox/streets-v12';
+    }
+  };
+
+  const updateMarkers = () => {
+    if (!map.current) return;
+
+    // Clear existing markers
+    markers.current.forEach(marker => marker.remove());
+    markers.current = [];
+
+    // Add new markers
+    filteredTemples.forEach((temple) => {
+      const el = document.createElement('div');
+      el.className = 'temple-marker';
+      el.style.width = `${getScaleSize(temple.scale)}px`;
+      el.style.height = `${getScaleSize(temple.scale)}px`;
+      el.style.backgroundColor = getReligionColor(temple.religion);
+      el.style.border = '2px solid white';
+      el.style.borderRadius = '50%';
+      el.style.cursor = 'pointer';
+      el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+      el.style.transition = 'all 0.3s ease';
+
+      el.addEventListener('mouseenter', () => {
+        el.style.transform = 'scale(1.2)';
+        el.style.zIndex = '1000';
+      });
+
+      el.addEventListener('mouseleave', () => {
+        el.style.transform = 'scale(1)';
+        el.style.zIndex = 'auto';
+      });
+
+      const marker = new mapboxgl.Marker(el)
+        .setLngLat(temple.coordinates)
+        .addTo(map.current!);
+
+      marker.getElement().addEventListener('click', () => {
+        onTempleSelect(temple);
+        // Fly to temple
+        map.current?.flyTo({
+          center: temple.coordinates,
+          zoom: 15,
+          duration: 1000
+        });
+      });
+
+      markers.current.push(marker);
+    });
+  };
 
   return (
     <div className="relative flex-1 h-full">
+      {/* Mapbox Token Input */}
+      {!mapboxToken && (
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center z-50">
+          <div className="floating-panel p-8 max-w-md w-full mx-4">
+            <div className="text-center mb-6">
+              <MapPin className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">需要 Mapbox 访问令牌</h3>
+              <p className="text-muted-foreground text-sm">
+                请在 <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">mapbox.com</a> 获取您的公共访问令牌
+              </p>
+            </div>
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="pk.eyJ1IjoieW91ci11c2VybmFtZSIsImEiOiJjbGt..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                onChange={(e) => setMapboxToken(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                输入您的 Mapbox 公共访问令牌以启用地图功能
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Map Container */}
-      <div ref={mapContainer} className="w-full h-full" />
+      <div ref={mapContainer} className="w-full h-full rounded-xl overflow-hidden" />
       
       {/* Map Controls */}
       <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
         <Button
           variant="outline"
           size="sm"
-          className="bg-card shadow-panel"
-          onClick={() => setZoom(prev => Math.min(prev + 1, 18))}
+          className="floating-panel h-10 w-10 p-0"
+          onClick={() => {
+            if (map.current) {
+              map.current.zoomIn();
+            }
+          }}
         >
           <ZoomIn className="h-4 w-4" />
         </Button>
         <Button
           variant="outline"
           size="sm"
-          className="bg-card shadow-panel"
-          onClick={() => setZoom(prev => Math.max(prev - 1, 1))}
+          className="floating-panel h-10 w-10 p-0"
+          onClick={() => {
+            if (map.current) {
+              map.current.zoomOut();
+            }
+          }}
         >
           <ZoomOut className="h-4 w-4" />
         </Button>
         <Button
           variant="outline"
           size="sm"
-          className="bg-card shadow-panel"
+          className="floating-panel h-10 w-10 p-0"
+          onClick={() => {
+            if (map.current) {
+              map.current.flyTo({
+                center: [106.5805, 29.5647],
+                zoom: 10,
+                duration: 1000
+              });
+            }
+          }}
         >
           <Locate className="h-4 w-4" />
         </Button>
         <Button
           variant="outline"
           size="sm"
-          className="bg-card shadow-panel"
-          onClick={() => setZoom(10)}
+          className="floating-panel h-10 w-10 p-0"
+          onClick={() => {
+            if (map.current) {
+              map.current.resetNorth();
+            }
+          }}
         >
-          <RotateCcw className="h-4 w-4" />
+          <Navigation className="h-4 w-4" />
         </Button>
       </div>
 
       {/* Layer Controls */}
       <div className="absolute top-4 left-4 z-10">
-        <div className="bg-card rounded-lg shadow-panel p-3 space-y-2">
-          <div className="flex items-center gap-2 mb-2">
-            <Layers className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">地图图层</span>
+        <div className="floating-panel p-4 space-y-3 min-w-[160px]">
+          <div className="flex items-center gap-2">
+            <Layers className="h-4 w-4 text-blue-500" />
+            <span className="text-sm font-medium">地图样式</span>
           </div>
           
           <div className="space-y-1">
             {[
-              { key: 'satellite', label: '卫星图' },
-              { key: 'historical', label: '历史地图' },
-              { key: 'terrain', label: '地形图' }
+              { key: 'streets', label: '街道地图' },
+              { key: 'satellite', label: '卫星图像' },
+              { key: 'outdoors', label: '户外地图' }
             ].map((style) => (
               <Button
                 key={style.key}
                 variant={mapStyle === style.key ? "default" : "ghost"}
                 size="sm"
                 className="w-full justify-start text-xs"
-                onClick={() => setMapStyle(style.key as any)}
+                onClick={() => {
+                  setMapStyle(style.key as any);
+                  if (map.current) {
+                    map.current.setStyle(getMapboxStyle(style.key));
+                  }
+                }}
               >
                 {style.label}
               </Button>
@@ -211,47 +325,51 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
       </div>
 
       {/* Legend */}
-      <div className="absolute bottom-4 left-4 bg-card rounded-lg shadow-panel p-3 z-10">
-        <div className="text-sm font-medium mb-2">图例</div>
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-buddhism" />
-            <span className="text-xs">佛教</span>
+      <div className="absolute bottom-4 left-4 floating-panel p-4 z-10 max-w-xs">
+        <div className="text-sm font-medium mb-3">图例</div>
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: getReligionColor('buddhism') }} />
+            <span className="text-sm">佛教寺庙</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-taoism" />
-            <span className="text-xs">道教</span>
+          <div className="flex items-center gap-3">
+            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: getReligionColor('taoism') }} />
+            <span className="text-sm">道教宫观</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-folk" />
-            <span className="text-xs">民间信仰</span>
+          <div className="flex items-center gap-3">
+            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: getReligionColor('folk') }} />
+            <span className="text-sm">民间信仰</span>
           </div>
         </div>
         
-        <div className="mt-3 pt-2 border-t border-border">
-          <div className="text-xs text-muted-foreground mb-1">规模等级</div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
-              <div className="w-4 h-4 rounded-full bg-muted border border-foreground" />
-              <span className="text-xs">国家级</span>
+        <div className="mt-4 pt-3 border-t border-gray-200">
+          <div className="text-xs text-muted-foreground mb-2">规模等级</div>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full bg-gray-300 border border-gray-400" />
+              <span className="text-xs">国家级 (16px)</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-muted border border-foreground" />
-              <span className="text-xs">省级</span>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-gray-300 border border-gray-400" />
+              <span className="text-xs">省级 (12px)</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-muted border border-foreground" />
-              <span className="text-xs">其他</span>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-gray-300 border border-gray-400" />
+              <span className="text-xs">其他 (8-10px)</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Year Display */}
-      <div className="absolute bottom-4 right-4 bg-card rounded-lg shadow-panel p-3 z-10">
+      <div className="absolute bottom-4 right-4 floating-panel p-4 z-10">
         <div className="text-center">
-          <div className="text-lg font-bold text-primary">{currentYear}</div>
-          <div className="text-xs text-muted-foreground">显示 {filteredTemples.length} 处</div>
+          <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            {currentYear}
+          </div>
+          <div className="text-sm text-muted-foreground mt-1">
+            显示 {filteredTemples.length} 处宗教场所
+          </div>
         </div>
       </div>
     </div>

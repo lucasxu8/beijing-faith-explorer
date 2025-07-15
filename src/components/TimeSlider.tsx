@@ -1,21 +1,18 @@
 import { useState } from "react";
-import { Play, Pause, RotateCcw } from "lucide-react";
+import { Play, Pause, RotateCcw, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 
 interface TimeSliderProps {
   currentYear: number;
   onYearChange: (year: number) => void;
-  isPlaying: boolean;
-  onPlayToggle: () => void;
 }
 
 export const TimeSlider = ({ 
   currentYear, 
-  onYearChange, 
-  isPlaying, 
-  onPlayToggle 
+  onYearChange
 }: TimeSliderProps) => {
+  const [isPlaying, setIsPlaying] = useState(false);
   const minYear = 618; // Tang Dynasty
   const maxYear = 2024; // Current year
   
@@ -37,106 +34,69 @@ export const TimeSlider = ({
   };
 
   return (
-    <div className="bg-card border-t border-border shadow-panel p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Controls */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onPlayToggle}
-              className="w-20"
-            >
-              {isPlaying ? (
-                <>
-                  <Pause className="h-4 w-4 mr-1" />
-                  暂停
-                </>
-              ) : (
-                <>
-                  <Play className="h-4 w-4 mr-1" />
-                  播放
-                </>
-              )}
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handleReset}>
-              <RotateCcw className="h-4 w-4 mr-1" />
-              重置
-            </Button>
-          </div>
-          
-          <div className="text-center">
-            <div className="text-2xl font-bold text-primary">
-              {currentYear}年
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {currentYear < 1912 ? "古代" : currentYear < 1949 ? "民国" : "现代"}
-            </div>
-          </div>
-          
-          <div className="text-sm text-muted-foreground">
-            播放速度: 10年/秒
-          </div>
+    <div className="floating-panel p-6 mx-4 max-w-4xl w-full">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Clock className="h-5 w-5 text-blue-500" />
+          <h3 className="text-lg font-semibold">时间轴控制</h3>
         </div>
-
-        {/* Timeline */}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="h-8 w-8 p-0"
+          >
+            {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onYearChange(618)}
+            className="h-8 w-8 p-0"
+          >
+            <RotateCcw className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+      
+      <div className="space-y-6">
         <div className="relative">
-          {/* Dynasty markers */}
-          <div className="relative h-12 mb-2">
-            {dynasties.map((dynasty, index) => (
-              <div
-                key={dynasty.name}
-                className="absolute transform -translate-x-1/2 cursor-pointer group"
-                style={{ left: `${getPositionPercent(dynasty.year)}%` }}
-                onClick={() => onYearChange(dynasty.year)}
-              >
-                <div className="flex flex-col items-center">
-                  <div className={`w-3 h-3 rounded-full ${dynasty.color} border-2 border-background shadow-sm group-hover:scale-125 transition-transform`} />
-                  <div className="text-xs font-medium mt-1 text-foreground group-hover:text-primary transition-colors">
-                    {dynasty.name}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {dynasty.year}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Slider */}
-          <div className="px-4">
-            <Slider
-              value={[currentYear]}
-              onValueChange={(value) => onYearChange(value[0])}
-              min={minYear}
-              max={maxYear}
-              step={1}
-              className="w-full"
-            />
-          </div>
-
-          {/* Year labels */}
-          <div className="flex justify-between mt-2 px-4">
-            <span className="text-xs text-muted-foreground">{minYear}</span>
-            <span className="text-xs text-muted-foreground">{maxYear}</span>
-          </div>
+          <Slider
+            value={[currentYear]}
+            onValueChange={(value) => onYearChange(value[0])}
+            max={2024}
+            min={618}
+            step={1}
+            className="w-full"
+          />
         </div>
-
-        {/* Timeline legend */}
-        <div className="flex justify-center items-center gap-6 mt-4 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-buddhism" />
-            <span>寺庙建立</span>
+        
+        <div className="grid grid-cols-6 gap-4 text-center">
+          {[
+            { year: 618, dynasty: '唐朝' },
+            { year: 960, dynasty: '宋朝' },
+            { year: 1368, dynasty: '明朝' },
+            { year: 1644, dynasty: '清朝' },
+            { year: 1912, dynasty: '民国' },
+            { year: 2024, dynasty: '现代' }
+          ].map((period) => (
+            <button
+              key={period.year}
+              onClick={() => onYearChange(period.year)}
+              className="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <span className="text-sm font-medium text-gray-900">{period.year}</span>
+              <span className="text-xs text-gray-500">{period.dynasty}</span>
+            </button>
+          ))}
+        </div>
+        
+        <div className="text-center bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4">
+          <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            {currentYear}
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-taoism" />
-            <span>重大事件</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-folk" />
-            <span>历史人物</span>
-          </div>
+          <div className="text-sm text-gray-600 mt-1">当前年份</div>
         </div>
       </div>
     </div>

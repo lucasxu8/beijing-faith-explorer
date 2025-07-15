@@ -71,55 +71,39 @@ const Index = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-background">
-      {/* Header */}
+    <div className="min-h-screen bg-gray-50">
       <Header 
         onMenuToggle={() => setIsFilterOpen(!isFilterOpen)}
         isMobile={isMobile}
       />
-
-      {/* Main Content */}
-      <div className="flex-1 flex relative overflow-hidden">
-        {/* Filter Panel */}
-        {(!isMobile || isFilterOpen) && (
-          <div className={isMobile ? "absolute inset-0 z-40" : ""}>
-            <FilterPanel
-              isOpen={isFilterOpen}
-              onToggle={() => setIsFilterOpen(!isFilterOpen)}
-              isMobile={isMobile}
-            />
-          </div>
-        )}
-
-        {/* Map View */}
-        <div className="flex-1 relative">
-          <MapView
+      <div className="flex h-[calc(100vh-4rem)]">
+        <FilterPanel 
+          isOpen={isFilterOpen}
+          onToggle={() => setIsFilterOpen(!isFilterOpen)}
+          isMobile={isMobile}
+        />
+        <div className="flex-1 flex flex-col relative">
+          <MapView 
             currentYear={currentYear}
-            onTempleSelect={handleTempleSelect}
+            onTempleSelect={setSelectedTemple}
             selectedTemple={selectedTemple}
           />
-        </div>
-
-        {/* Detail Panel */}
-        {isDetailOpen && (
-          <div className={isMobile ? "absolute inset-0 z-50" : ""}>
-            <DetailPanel
-              temple={selectedTemple}
-              isOpen={isDetailOpen}
-              onClose={handleDetailClose}
-              isMobile={isMobile}
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
+            <TimeSlider 
+              currentYear={currentYear}
+              onYearChange={setCurrentYear}
             />
           </div>
+        </div>
+        {selectedTemple && (
+          <DetailPanel 
+            temple={selectedTemple}
+            onClose={() => setSelectedTemple(null)}
+            isOpen={!!selectedTemple}
+            isMobile={isMobile}
+          />
         )}
       </div>
-
-      {/* Time Slider */}
-      <TimeSlider
-        currentYear={currentYear}
-        onYearChange={handleYearChange}
-        isPlaying={isPlaying}
-        onPlayToggle={handlePlayToggle}
-      />
     </div>
   );
 };
