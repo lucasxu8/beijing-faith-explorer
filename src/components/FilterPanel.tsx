@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Filter } from "lucide-react";
+import { ChevronDown, ChevronUp, Filter, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { TimeSlider } from "@/components/TimeSlider";
 
 interface FilterOption {
   id: string;
@@ -16,10 +17,13 @@ interface FilterPanelProps {
   isOpen: boolean;
   onToggle: () => void;
   isMobile: boolean;
+  currentYear: number;
+  onYearChange: (year: number) => void;
 }
 
-export const FilterPanel = ({ isOpen, onToggle, isMobile }: FilterPanelProps) => {
+export const FilterPanel = ({ isOpen, onToggle, isMobile, currentYear, onYearChange }: FilterPanelProps) => {
   const [expandedSections, setExpandedSections] = useState({
+    timeControl: true,
     religion: true,
     period: true,
     status: false,
@@ -128,6 +132,45 @@ export const FilterPanel = ({ isOpen, onToggle, isMobile }: FilterPanelProps) =>
       </CardHeader>
       
       <CardContent className="space-y-6">
+        {/* 时间轴控制 */}
+        <Collapsible
+          open={expandedSections.timeControl}
+          onOpenChange={() => toggleSection('timeControl')}
+        >
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              className="w-full justify-between p-2 h-auto font-medium"
+            >
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-primary" />
+                时间轴控制
+              </div>
+              {expandedSections.timeControl ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-4">
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary mb-1">
+                  {currentYear}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  当前年份
+                </div>
+              </div>
+              <TimeSlider 
+                currentYear={currentYear}
+                onYearChange={onYearChange}
+              />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+        
         <FilterSection
           title="宗教类型"
           options={religions}

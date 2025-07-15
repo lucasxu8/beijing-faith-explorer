@@ -258,15 +258,15 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
       el.style.padding = '3px';
 
       el.addEventListener('mouseenter', () => {
-        el.style.transform = 'scale(1.3)';
         el.style.zIndex = '1000';
-        el.style.boxShadow = '0 4px 16px rgba(0,0,0,0.4)';
+        el.style.boxShadow = '0 6px 20px rgba(0,0,0,0.5)';
+        el.style.border = '3px solid white';
       });
 
       el.addEventListener('mouseleave', () => {
-        el.style.transform = 'scale(1)';
         el.style.zIndex = '10';
         el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+        el.style.border = '2px solid white';
       });
 
       const marker = new mapboxgl.Marker(el)

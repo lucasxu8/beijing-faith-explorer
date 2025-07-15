@@ -83,6 +83,8 @@ const Index = () => {
           isOpen={isFilterOpen}
           onToggle={() => setIsFilterOpen(!isFilterOpen)}
           isMobile={isMobile}
+          currentYear={currentYear}
+          onYearChange={handleYearChange}
         />
         <div className="flex-1 flex flex-col relative">
           <MapView 
@@ -91,28 +93,6 @@ const Index = () => {
             selectedTemple={selectedTemple}
           />
           
-          {/* 时间轴显示/隐藏按钮 */}
-          <div className="absolute bottom-24 right-6 z-20">
-            <Button
-              variant="outline"
-              size="sm"
-              className="glass-panel h-12 w-12 p-0 rounded-xl border-0 hover:scale-105 transition-transform"
-              onClick={() => setIsTimeSliderVisible(!isTimeSliderVisible)}
-              title={isTimeSliderVisible ? "隐藏时间轴" : "显示时间轴"}
-            >
-              {isTimeSliderVisible ? "⏰" : "📅"}
-            </Button>
-          </div>
-
-          {/* 时间轴控制 */}
-          {isTimeSliderVisible && (
-            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
-              <TimeSlider 
-                currentYear={currentYear}
-                onYearChange={setCurrentYear}
-              />
-            </div>
-          )}
         </div>
         {selectedTemple && (
           <DetailPanel 
