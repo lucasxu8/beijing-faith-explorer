@@ -170,10 +170,10 @@ export const FilterPanel = ({ isOpen, onToggle, isMobile, currentYear, onYearCha
   ];
 
   const religions: FilterOption[] = [
-    { id: "buddhism", label: "佛教", count: 3, color: "bg-buddhism" },
-    { id: "taoism", label: "道教", count: 2, color: "bg-taoism" },
-    { id: "catholic", label: "天主教", count: 2, color: "bg-catholic" },
-    { id: "islam", label: "伊斯兰教", count: 2, color: "bg-islam" },
+    { id: "buddhism", label: "佛教", count: 5, color: "bg-orange-500" },
+    { id: "taoism", label: "道教", count: 2, color: "bg-teal-500" },
+    { id: "catholic", label: "天主教", count: 1, color: "bg-purple-500" },
+    { id: "islam", label: "伊斯兰教", count: 1, color: "bg-green-500" },
   ];
 
   const periods: FilterOption[] = [
@@ -204,6 +204,16 @@ export const FilterPanel = ({ isOpen, onToggle, isMobile, currentYear, onYearCha
       newSelected = selectedReligions.filter(id => id !== religionId);
     }
     onReligionFilter(newSelected);
+  };
+
+  const getReligionIcon = (religionId: string) => {
+    switch (religionId) {
+      case 'buddhism': return '🏯';
+      case 'taoism': return '⛩️';
+      case 'catholic': return '⛪';
+      case 'islam': return '🕌';
+      default: return '🏛️';
+    }
   };
 
   const FilterSection = ({ 
@@ -246,7 +256,10 @@ export const FilterPanel = ({ isOpen, onToggle, isMobile, currentYear, onYearCha
                 }
               }}
             />
-            {showColors && option.color && (
+            {sectionKey === 'religion' && (
+              <span className="text-lg">{getReligionIcon(option.id)}</span>
+            )}
+            {showColors && option.color && sectionKey !== 'religion' && (
               <div className={`w-3 h-3 rounded-full ${option.color}`} />
             )}
             <label

@@ -97,18 +97,6 @@ const Index = () => {
             selectedTemple={selectedTemple}
             selectedReligions={selectedReligions}
           />
-          
-          {/* 时间轴控制器 */}
-          {isTimeSliderVisible && (
-            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
-              <TimeSlider 
-                currentYear={currentYear}
-                onYearChange={handleYearChange}
-                isPlaying={isPlaying}
-                onPlayToggle={handlePlayToggle}
-              />
-            </div>
-          )}
         </div>
         {selectedTemple && (
           <DetailPanel 
