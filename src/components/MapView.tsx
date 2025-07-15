@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Layers, ZoomIn, ZoomOut, Locate, RotateCcw, Navigation, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface Temple {
   id: string;
