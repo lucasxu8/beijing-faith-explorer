@@ -30,7 +30,7 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple }: MapView
   const [mapStyle, setMapStyle] = useState<'vintage' | 'terrain'>('vintage');
   const [zoom, setZoom] = useState(10);
   const [showClusters, setShowClusters] = useState(true);
-  const [mapboxToken, setMapboxToken] = useState('');
+  const [mapboxToken, setMapboxToken] = useState('pk.eyJ1IjoidGVzdC1sb3ZhYmxlIiwiYSI6ImNsdmw4cXB6YzFydDIyanM4OGlhZGt5bXcifQ.GglwdQNJZ5TIhF8W9gkHdw');
 
   // 重庆地区宗教场所数据
   const temples: Temple[] = [
