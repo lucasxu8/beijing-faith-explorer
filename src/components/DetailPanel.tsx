@@ -3,20 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-
-interface Temple {
-  id: string;
-  name: string;
-  location: string;
-  religion: "buddhism" | "taoism" | "catholic" | "islam";
-  establishedYear: number;
-  status: "active" | "renovation" | "ruins";
-  description: string;
-  imageUrl: string;
-  coordinates: [number, number];
-  relatedPeople: string[];
-  relatedEvents: string[];
-}
+import { Temple } from "@/types/temple";
 
 interface DetailPanelProps {
   temple: Temple | null;

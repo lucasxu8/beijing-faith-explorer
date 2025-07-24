@@ -5,21 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { TimeSlider } from "@/components/TimeSlider";
-
-// 寺庙数据类型
-interface Temple {
-  id: string;
-  name: string;
-  location: string;
-  religion: "buddhism" | "taoism" | "catholic" | "islam";
-  establishedYear: number;
-  status: "active" | "renovation" | "ruins";
-  description: string;
-  imageUrl: string;
-  coordinates: [number, number];
-  relatedPeople: string[];
-  relatedEvents: string[];
-}
+import { Temple } from "@/types/temple";
 
 interface FilterOption {
   id: string;
