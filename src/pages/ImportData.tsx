@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Database, Upload, CheckCircle, AlertCircle } from "lucide-react";
 import { importTemples } from "@/scripts/importTemples";
+import { templesData } from "@/data/templesData";
 
 export const ImportData = () => {
   const [isImporting, setIsImporting] = useState(false);
@@ -46,8 +47,8 @@ export const ImportData = () => {
               导入寺庙数据
             </CardTitle>
             <CardDescription>
-              这将会把所有 9 个重庆地区的寺庙数据导入到您的 Firestore 数据库中。
-              每个寺庙将作为一个单独的文档存储在 "temples" 集合中。
+              这将会把所有 {templesData.length} 个重庆地区的宗教场所数据导入到您的 Firestore 数据库中。
+              每个场所将作为一个单独的文档存储在 "temples" 集合中。
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -66,7 +67,7 @@ export const ImportData = () => {
               <Alert className="border-green-500 bg-green-50">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 <AlertDescription className="text-green-800">
-                  🎉 数据导入成功！所有 9 个寺庙数据已成功导入到 Firestore 中。
+                  🎉 数据导入成功！所有 {templesData.length} 个场所数据已成功导入到 Firestore 中。
                   您现在可以在 Firebase 控制台中查看这些数据。
                 </AlertDescription>
               </Alert>
@@ -107,17 +108,13 @@ export const ImportData = () => {
 
             {/* 数据预览 */}
             <div className="mt-8 p-4 bg-muted rounded-lg">
-              <h3 className="font-semibold mb-2">将要导入的数据包括：</h3>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• 重庆大足石刻宝顶山石窟 (佛教, 1179年)</li>
-                <li>• 重庆慈云寺 (佛教, 1927年)</li>
-                <li>• 重庆华岩寺 (佛教, 1650年)</li>
-                <li>• 重庆老君洞道观 (道教, 1700年)</li>
-                <li>• 重庆天主教堂（若瑟堂） (天主教, 1900年)</li>
-                <li>• 重庆清真寺 (伊斯兰教, 1850年)</li>
-                <li>• 重庆罗汉寺 (佛教, 1000年)</li>
-                <li>• 重庆绍龙观 (道教, 1368年)</li>
-                <li>• 重庆双桂堂 (佛教, 1653年)</li>
+              <h3 className="font-semibold mb-2">将要导入的数据预览：</h3>
+              <ul className="text-sm text-muted-foreground space-y-1 max-h-48 overflow-y-auto">
+                {templesData.map(temple => (
+                  <li key={temple.id}>
+                    • {temple.name} ({temple.religion}, {temple.establishedYear}年)
+                  </li>
+                ))}
               </ul>
             </div>
           </CardContent>
