@@ -171,22 +171,28 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple, selectedR
       
       const el = document.createElement('div');
       el.className = 'temple-marker';
-      el.textContent = getReligionIcon(temple.religion);
       el.style.width = '28px';
       el.style.height = '28px';
-      el.style.display = 'flex';
-      el.style.alignItems = 'center';
-      el.style.justifyContent = 'center';
-      el.style.fontSize = '18px';
-      el.style.lineHeight = '1';
+      el.style.display = 'block';
       el.style.cursor = 'pointer';
       el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)';
       el.style.background = 'rgba(255,255,255,0.92)';
       el.style.border = '1px solid rgba(255,255,255,0.95)';
       el.style.borderRadius = '999px';
       el.style.transition = 'box-shadow 0.2s ease';
-      el.style.position = 'relative';
       el.style.zIndex = '10';
+
+      const icon = document.createElement('span');
+      icon.textContent = getReligionIcon(temple.religion);
+      icon.style.display = 'block';
+      icon.style.width = '100%';
+      icon.style.height = '100%';
+      icon.style.textAlign = 'center';
+      icon.style.lineHeight = '28px';
+      icon.style.fontSize = '18px';
+      icon.style.userSelect = 'none';
+      icon.style.pointerEvents = 'none';
+      el.appendChild(icon);
 
       el.addEventListener('mouseenter', () => {
         el.style.zIndex = '1000';
