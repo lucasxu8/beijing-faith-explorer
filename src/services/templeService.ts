@@ -1,4 +1,4 @@
-import { collection, getDocs, doc, getDoc, query, where, orderBy, GeoPoint } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, query, where, orderBy, GeoPoint, writeBatch } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Temple } from "@/types/temple";
 
@@ -139,3 +139,32 @@ export const getTemplesByReligion = async (religions: string[]): Promise<Temple[
     throw error;
   }
 }; 
+
+/**
+ * 全量同步寺庙数据到 Firestore（包含新增、更新、删除）
+ */
+export const syncTemplesToFirestore = async (temples: Temple[]): Promise<void> => {
+  const templesCollection = collection(db, "temples");
+  const snapshot = await getDocs(templesCollection);
+  const existingIds = new Set(snapshot.docs.map((item) => item.id));
+  const nextIds = new Set(temples.map((temple) => temple.id));
+
+  const batch = writeBatch(db);
+
+  temples.forEach((temple) => {
+    const templeRef = doc(templesCollection, temple.id);
+    batch.set(templeRef, {
+      ...temple,
+      coordinates: new GeoPoint(temple.coordinates[1], temple.coordinates[0]),
+    });
+  });
+
+  existingIds.forEach((id) => {
+    if (!nextIds.has(id)) {
+      const templeRef = doc(templesCollection, id);
+      batch.delete(templeRef);
+    }
+  });
+
+  await batch.commit();
+};

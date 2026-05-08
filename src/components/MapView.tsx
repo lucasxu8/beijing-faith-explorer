@@ -38,6 +38,21 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple, selectedR
     }
   };
 
+  const getReligionIcon = (religion: string) => {
+    switch (religion) {
+      case "buddhism":
+        return "🏯";
+      case "catholic":
+        return "⛪";
+      case "islam":
+        return "🕌";
+      case "taoism":
+        return "⛩️";
+      default:
+        return "🏛️";
+    }
+  };
+
   const getMarkerSize = (religion: string) => {
     // All markers same size for simplicity
     return 14;
@@ -54,14 +69,14 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple, selectedR
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: getMapboxStyle(mapStyle),
-      center: [106.5805, 29.5647], // Chongqing center
-      zoom: 9, // 更适合重庆市区的缩放级别
+      center: [116.40, 39.90], // Chongqing center
+      zoom: 11, // 更适合重庆市区的缩放级别
       pitch: 0, // 减少倾斜角度
       bearing: 0,
       antialias: true,
       maxBounds: [
-        [104.0, 28.0], // 西南边界
-        [110.0, 32.0]  // 东北边界
+      [115.0, 39.4], // 西南
+      [117.2, 40.5]  // 东北
       ] // 限制地图范围在重庆周边
     });
 
@@ -80,7 +95,12 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple, selectedR
     // Wait for map to load before adding markers
     map.current.on('load', () => {
       console.log('Map loaded successfully');
+      applyChineseLabels();
       updateMarkers();
+    });
+
+    map.current.on('styledata', () => {
+      applyChineseLabels();
     });
 
     map.current.on('error', (e) => {
@@ -94,12 +114,12 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple, selectedR
     };
   }, [mapboxToken, mapStyle]);
 
-  // Update markers when temples or year changes
+  // Update markers when temples or filters change
   useEffect(() => {
     if (map.current) {
       updateMarkers();
     }
-  }, [currentYear, selectedReligions]);
+  }, [temples, currentYear, selectedReligions]);
 
   const getMapboxStyle = (style: string) => {
     switch (style) {
@@ -110,6 +130,25 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple, selectedR
       default:
         return 'mapbox://styles/mapbox/light-v11'; // Default to clean vintage style
     }
+  };
+
+  const applyChineseLabels = () => {
+    if (!map.current?.isStyleLoaded()) return;
+
+    const style = map.current.getStyle();
+    style.layers?.forEach((layer) => {
+      if (layer.type !== "symbol" || !layer.layout || !("text-field" in layer.layout)) return;
+      try {
+        map.current?.setLayoutProperty(layer.id, "text-field", [
+          "coalesce",
+          ["get", "name_zh-Hans"],
+          ["get", "name_zh"],
+          ["get", "name"],
+        ]);
+      } catch (_error) {
+        // Some symbol layers cannot be overridden; skip them.
+      }
+    });
   };
 
   const updateMarkers = () => {
@@ -132,36 +171,41 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple, selectedR
       
       const el = document.createElement('div');
       el.className = 'temple-marker';
-      el.style.width = `${getMarkerSize(temple.religion)}px`;
-      el.style.height = `${getMarkerSize(temple.religion)}px`;
-      el.style.backgroundColor = getReligionColor(temple.religion);
-      el.style.border = '2px solid white';
-      el.style.borderRadius = '50%';
+      el.textContent = getReligionIcon(temple.religion);
+      el.style.width = '28px';
+      el.style.height = '28px';
+      el.style.display = 'flex';
+      el.style.alignItems = 'center';
+      el.style.justifyContent = 'center';
+      el.style.fontSize = '18px';
+      el.style.lineHeight = '1';
       el.style.cursor = 'pointer';
-      el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
-      el.style.transition = 'all 0.3s ease';
+      el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)';
+      el.style.background = 'rgba(255,255,255,0.92)';
+      el.style.border = '1px solid rgba(255,255,255,0.95)';
+      el.style.borderRadius = '999px';
+      el.style.transition = 'box-shadow 0.2s ease';
       el.style.position = 'relative';
       el.style.zIndex = '10';
 
-      // 增强点击区域
-      el.style.minWidth = '20px';
-      el.style.minHeight = '20px';
-      el.style.padding = '3px';
-
       el.addEventListener('mouseenter', () => {
         el.style.zIndex = '1000';
-        el.style.boxShadow = '0 6px 20px rgba(0,0,0,0.5)';
-        el.style.border = '3px solid white';
+        el.style.boxShadow = '0 6px 20px rgba(0,0,0,0.35)';
       });
 
       el.addEventListener('mouseleave', () => {
         el.style.zIndex = '10';
-        el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
-        el.style.border = '2px solid white';
+        el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)';
       });
 
       try {
-        const marker = new mapboxgl.Marker(el)
+        const marker = new mapboxgl.Marker({
+          element: el,
+          anchor: 'center',
+          offset: [0, 0],
+          pitchAlignment: 'map',
+          rotationAlignment: 'map',
+        })
           .setLngLat(temple.coordinates)
           .addTo(map.current!);
 
@@ -306,19 +350,15 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple, selectedR
         <div className="text-sm font-semibold mb-4 golden-accent">图例</div>
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-5 h-5 rounded-full shadow-md" style={{ backgroundColor: getReligionColor('buddhism') }} />
+            <span className="text-lg">🏯</span>
             <span className="text-sm font-medium">佛教寺庙</span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-5 h-5 rounded-full shadow-md" style={{ backgroundColor: getReligionColor('taoism') }} />
-            <span className="text-sm font-medium">道教宫观</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-5 h-5 rounded-full shadow-md" style={{ backgroundColor: getReligionColor('catholic') }} />
+            <span className="text-lg">⛪</span>
             <span className="text-sm font-medium">天主教堂</span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-5 h-5 rounded-full shadow-md" style={{ backgroundColor: getReligionColor('islam') }} />
+            <span className="text-lg">🕌</span>
             <span className="text-sm font-medium">伊斯兰清真寺</span>
           </div>
         </div>

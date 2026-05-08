@@ -3,23 +3,24 @@ import { useQuery } from '@tanstack/react-query';
 import { Header } from "@/components/Header";
 import { FilterPanel } from "@/components/FilterPanel";
 import { MapView } from "@/components/MapView";
-import { TimeSlider } from "@/components/TimeSlider";
 import { DetailPanel } from "@/components/DetailPanel";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Temple } from "@/types/temple";
 import { getTemples } from "@/services/templeService";
+import { getTempleData } from "@/lib/templeDataManager";
 import { AlertCircle, Loader2 } from "lucide-react";
 
 const Index = () => {
-  const [currentYear, setCurrentYear] = useState(2024);
+  const [currentYear, setCurrentYear] = useState(2026);
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedTemple, setSelectedTemple] = useState<Temple | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isTimeSliderVisible, setIsTimeSliderVisible] = useState(true);
   const [selectedReligions, setSelectedReligions] = useState<string[]>([]);
+  const [selectedPeriods, setSelectedPeriods] = useState<string[]>([]);
+  const [searchKeyword, setSearchKeyword] = useState("");
   
   const isMobile = useIsMobile();
 
@@ -31,12 +32,60 @@ const Index = () => {
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
+  const managedTemples = getTempleData();
+  const sourceTemples = (managedTemples.length > 0 ? managedTemples : temples || []).filter(
+    (temple) => temple.religion !== "taoism"
+  );
+  const normalizedKeyword = searchKeyword.trim().toLowerCase();
+  const searchSuggestions = normalizedKeyword.length === 0
+    ? []
+    : sourceTemples
+        .filter((temple) =>
+          [
+            temple.name,
+            temple.location,
+            temple.description,
+            ...temple.relatedPeople,
+            ...temple.relatedEvents,
+          ]
+            .join(" ")
+            .toLowerCase()
+            .includes(normalizedKeyword)
+        )
+        .slice(0, 8);
+
   // 处理筛选逻辑
-  const filteredTemples = temples?.filter(temple => {
+  const filteredTemples = sourceTemples.filter(temple => {
     const yearFilter = temple.establishedYear <= currentYear;
     const religionFilter = selectedReligions.length === 0 || selectedReligions.includes(temple.religion);
-    return yearFilter && religionFilter;
-  }) || [];
+    const periodFilter =
+      selectedPeriods.length === 0 ||
+      selectedPeriods.some((period) => {
+        if (period === "ancient") {
+          return temple.establishedYear >= 618 && temple.establishedYear <= 1911;
+        }
+        if (period === "modern") {
+          return temple.establishedYear >= 1912 && temple.establishedYear <= 2024;
+        }
+        return false;
+      });
+    const searchFilter =
+      normalizedKeyword.length === 0 ||
+      [
+        temple.name,
+        temple.location,
+        temple.description,
+        temple.religion,
+        String(temple.establishedYear),
+        ...temple.relatedPeople,
+        ...temple.relatedEvents,
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(normalizedKeyword);
+
+    return yearFilter && religionFilter && periodFilter && searchFilter;
+  });
 
   // Auto-play animation
   useEffect(() => {
@@ -79,8 +128,29 @@ const Index = () => {
     setIsPlaying(false); // Stop playing when manually changing year
   };
 
+  const handleSuggestionSelect = (temple: Temple) => {
+    setSearchKeyword(temple.name);
+    setSelectedTemple(temple);
+    setIsDetailOpen(true);
+    if (isMobile) {
+      setIsFilterOpen(false);
+    }
+  };
+
+  const handleExportJson = () => {
+    const blob = new Blob([JSON.stringify(sourceTemples, null, 2)], {
+      type: "application/json;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "temples-data.json";
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
   // 加载状态
-  if (isLoading) {
+  if (isLoading && sourceTemples.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -93,7 +163,7 @@ const Index = () => {
   }
 
   // 错误状态
-  if (error) {
+  if (error && sourceTemples.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full">
@@ -124,6 +194,11 @@ const Index = () => {
       <Header 
         onMenuToggle={() => setIsFilterOpen(!isFilterOpen)}
         isMobile={isMobile}
+        searchKeyword={searchKeyword}
+        onSearchChange={setSearchKeyword}
+        searchSuggestions={searchSuggestions}
+        onSuggestionSelect={handleSuggestionSelect}
+        onExportJson={handleExportJson}
       />
       <div className="flex h-[calc(100vh-4rem)]">
         <FilterPanel 
@@ -135,6 +210,9 @@ const Index = () => {
           onTempleSelect={handleTempleSelect}
           selectedReligions={selectedReligions}
           onReligionFilter={setSelectedReligions}
+          selectedPeriods={selectedPeriods}
+          onPeriodFilter={setSelectedPeriods}
+          temples={sourceTemples}
         />
         <div className="flex-1 flex flex-col relative">
           <MapView 
@@ -158,7 +236,7 @@ const Index = () => {
       {/* 数据状态显示 */}
       <div className="fixed bottom-4 left-4 glass-panel p-3 z-10 rounded-lg text-sm">
         <span className="text-muted-foreground">
-          数据来源: Firestore | 显示 {filteredTemples.length} / {temples?.length || 0} 个场所
+          数据来源: 本地数据管理后台 | 显示 {filteredTemples.length} / {sourceTemples.length} 个场所
         </span>
       </div>
     </div>

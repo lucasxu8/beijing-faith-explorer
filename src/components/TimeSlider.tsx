@@ -17,7 +17,7 @@ export const TimeSlider = ({
   onPlayToggle
 }: TimeSliderProps) => {
   const minYear = 618; // Tang Dynasty
-  const maxYear = 2024; // Current year
+  const maxYear = 2026; // Current year
   
   const dynasties = [
     { name: "唐", year: 618, color: "bg-buddhism" },
@@ -68,7 +68,7 @@ export const TimeSlider = ({
           <Slider
             value={[currentYear]}
             onValueChange={(value) => onYearChange(value[0])}
-            max={2024}
+            max={2026}
             min={618}
             step={1}
             className="w-full"
@@ -82,7 +82,7 @@ export const TimeSlider = ({
             { year: 1368, dynasty: '明朝' },
             { year: 1644, dynasty: '清朝' },
             { year: 1912, dynasty: '民国' },
-            { year: 2024, dynasty: '现代' }
+            { year: 2026, dynasty: '现代' }
           ].map((period) => (
             <button
               key={period.year}
