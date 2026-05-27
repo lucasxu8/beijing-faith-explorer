@@ -6,8 +6,11 @@ export interface Temple {
   establishedYear: number;
   status: "active" | "renovation" | "ruins";
   description: string;
+  historicalBackground: string;
+  architecturalFeatures: string;
+  openingHours: string;
   imageUrl: string;
   coordinates: [number, number];
   relatedPeople: string[];
   relatedEvents: string[];
-} 
+}

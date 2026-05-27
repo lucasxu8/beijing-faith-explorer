@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { clearTempleData, getTempleData, saveTempleData } from "@/lib/templeDataManager";
+import { clearTempleData, getTempleData, normalizeTemple, saveTempleData } from "@/lib/templeDataManager";
 import { syncTemplesToFirestore } from "@/services/templeService";
 
 const EMPTY_FORM = {
@@ -18,6 +18,9 @@ const EMPTY_FORM = {
   establishedYear: 2000,
   status: "active" as Temple["status"],
   description: "",
+  historicalBackground: "",
+  architecturalFeatures: "",
+  openingHours: "",
   imageUrl: "",
   lng: 116.404,
   lat: 39.915,
@@ -71,6 +74,9 @@ export default function DataAdmin() {
       establishedYear: Number(form.establishedYear),
       status: form.status,
       description: form.description.trim() || "待补充描述",
+      historicalBackground: form.historicalBackground.trim(),
+      architecturalFeatures: form.architecturalFeatures.trim(),
+      openingHours: form.openingHours.trim(),
       imageUrl: form.imageUrl.trim() || "https://images.unsplash.com/photo-1473177104440-ffee2f376098?w=800&h=600&fit=crop",
       coordinates: [Number(form.lng), Number(form.lat)],
       relatedPeople: [],
@@ -96,6 +102,9 @@ export default function DataAdmin() {
       establishedYear: temple.establishedYear,
       status: temple.status,
       description: temple.description,
+      historicalBackground: temple.historicalBackground,
+      architecturalFeatures: temple.architecturalFeatures,
+      openingHours: temple.openingHours,
       imageUrl: temple.imageUrl,
       lng: temple.coordinates[0],
       lat: temple.coordinates[1],
@@ -123,6 +132,9 @@ export default function DataAdmin() {
             establishedYear: Number(editingForm.establishedYear),
             status: editingForm.status,
             description: editingForm.description.trim() || "待补充描述",
+            historicalBackground: editingForm.historicalBackground.trim(),
+            architecturalFeatures: editingForm.architecturalFeatures.trim(),
+            openingHours: editingForm.openingHours.trim(),
             imageUrl:
               editingForm.imageUrl.trim() ||
               "https://images.unsplash.com/photo-1473177104440-ffee2f376098?w=800&h=600&fit=crop",
@@ -154,8 +166,11 @@ export default function DataAdmin() {
       const text = await file.text();
       const parsed = JSON.parse(text);
       if (!Array.isArray(parsed)) throw new Error("JSON 必须是数组。");
-      await persistTemples(parsed as Temple[]);
-      toast({ title: "导入成功", description: `已导入 ${parsed.length} 条记录。` });
+      const normalized = (parsed as Record<string, unknown>[]).map((item) =>
+        normalizeTemple(item)
+      );
+      await persistTemples(normalized);
+      toast({ title: "导入成功", description: `已导入 ${normalized.length} 条记录。` });
     } catch (error) {
       toast({
         title: "导入失败",
@@ -171,8 +186,11 @@ export default function DataAdmin() {
     try {
       const parsed = JSON.parse(jsonText);
       if (!Array.isArray(parsed)) throw new Error("JSON 必须是数组。");
-      await persistTemples(parsed as Temple[]);
-      toast({ title: "JSON 已应用", description: `当前共 ${parsed.length} 条记录。` });
+      const normalized = (parsed as Record<string, unknown>[]).map((item) =>
+        normalizeTemple(item)
+      );
+      await persistTemples(normalized);
+      toast({ title: "JSON 已应用", description: `当前共 ${normalized.length} 条记录。` });
     } catch (error) {
       toast({
         title: "JSON 解析失败",
@@ -226,7 +244,10 @@ export default function DataAdmin() {
                 <Input placeholder="图片URL(可选)" value={form.imageUrl} onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))} />
                 <Input placeholder="经度" type="number" value={form.lng} onChange={(e) => setForm((p) => ({ ...p, lng: Number(e.target.value) }))} />
                 <Input placeholder="纬度" type="number" value={form.lat} onChange={(e) => setForm((p) => ({ ...p, lat: Number(e.target.value) }))} />
-                <Textarea className="md:col-span-2" placeholder="描述(可选)" value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} />
+                <Textarea className="md:col-span-2" placeholder="简介(可选)" value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} />
+                <Textarea className="md:col-span-2" placeholder="历史背景(可选)" value={form.historicalBackground} onChange={(e) => setForm((p) => ({ ...p, historicalBackground: e.target.value }))} />
+                <Textarea className="md:col-span-2" placeholder="建筑特点(可选)" value={form.architecturalFeatures} onChange={(e) => setForm((p) => ({ ...p, architecturalFeatures: e.target.value }))} />
+                <Input className="md:col-span-2" placeholder="开放时间(可选)" value={form.openingHours} onChange={(e) => setForm((p) => ({ ...p, openingHours: e.target.value }))} />
                 <div className="md:col-span-2">
                   <Button onClick={handleAddTemple} disabled={isSyncing}>
                     <Plus className="h-4 w-4 mr-2" />
@@ -253,7 +274,10 @@ export default function DataAdmin() {
                         <Input value={editingForm.imageUrl} onChange={(e) => setEditingForm((prev) => ({ ...prev, imageUrl: e.target.value }))} />
                         <Input type="number" value={editingForm.lng} onChange={(e) => setEditingForm((prev) => ({ ...prev, lng: Number(e.target.value) }))} />
                         <Input type="number" value={editingForm.lat} onChange={(e) => setEditingForm((prev) => ({ ...prev, lat: Number(e.target.value) }))} />
-                        <Textarea className="md:col-span-2" value={editingForm.description} onChange={(e) => setEditingForm((prev) => ({ ...prev, description: e.target.value }))} />
+                        <Textarea className="md:col-span-2" placeholder="简介" value={editingForm.description} onChange={(e) => setEditingForm((prev) => ({ ...prev, description: e.target.value }))} />
+                        <Textarea className="md:col-span-2" placeholder="历史背景" value={editingForm.historicalBackground} onChange={(e) => setEditingForm((prev) => ({ ...prev, historicalBackground: e.target.value }))} />
+                        <Textarea className="md:col-span-2" placeholder="建筑特点" value={editingForm.architecturalFeatures} onChange={(e) => setEditingForm((prev) => ({ ...prev, architecturalFeatures: e.target.value }))} />
+                        <Input className="md:col-span-2" placeholder="开放时间" value={editingForm.openingHours} onChange={(e) => setEditingForm((prev) => ({ ...prev, openingHours: e.target.value }))} />
                       </div>
                     ) : (
                       <div>

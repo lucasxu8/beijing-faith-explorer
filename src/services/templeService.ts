@@ -1,6 +1,17 @@
 import { collection, getDocs, doc, getDoc, query, where, orderBy, GeoPoint, writeBatch } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { normalizeTemple } from "@/lib/templeDataManager";
 import { Temple } from "@/types/temple";
+
+const mapDocToTemple = (id: string, data: Record<string, unknown>): Temple => {
+  let coordinates: [number, number] = [0, 0];
+  if (data.coordinates instanceof GeoPoint) {
+    coordinates = [data.coordinates.longitude, data.coordinates.latitude];
+  } else if (Array.isArray(data.coordinates) && data.coordinates.length === 2) {
+    coordinates = [Number(data.coordinates[0]), Number(data.coordinates[1])];
+  }
+  return normalizeTemple({ ...data, id, coordinates });
+};
 
 /**
  * 从 Firestore 获取所有寺庙数据
@@ -8,45 +19,21 @@ import { Temple } from "@/types/temple";
 export const getTemples = async (): Promise<Temple[]> => {
   try {
     console.log("开始从 Firestore 获取寺庙数据...");
-    
+
     const templesCollection = collection(db, "temples");
     const querySnapshot = await getDocs(templesCollection);
-    
+
     const temples: Temple[] = [];
-    
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      
-      // 处理 GeoPoint 转换为坐标数组
-      let coordinates: [number, number] = [0, 0];
-      if (data.coordinates && data.coordinates instanceof GeoPoint) {
-        coordinates = [data.coordinates.longitude, data.coordinates.latitude];
-      }
-      
-      // 确保数据符合 Temple 接口
-      const temple: Temple = {
-        id: doc.id,
-        name: data.name || "",
-        location: data.location || "",
-        religion: data.religion || "buddhism",
-        establishedYear: data.establishedYear || 0,
-        status: data.status || "active",
-        description: data.description || "",
-        imageUrl: data.imageUrl || "",
-        coordinates,
-        relatedPeople: data.relatedPeople || [],
-        relatedEvents: data.relatedEvents || []
-      };
-      
-      temples.push(temple);
+
+    querySnapshot.forEach((docSnap) => {
+      temples.push(mapDocToTemple(docSnap.id, docSnap.data() as Record<string, unknown>));
     });
-    
+
     console.log(`✅ 成功获取 ${temples.length} 个寺庙数据`);
     return temples;
-    
   } catch (error) {
     console.error("❌ 获取寺庙数据时发生错误:", error);
-    throw new Error(`获取寺庙数据失败: ${error instanceof Error ? error.message : '未知错误'}`);
+    throw new Error(`获取寺庙数据失败: ${error instanceof Error ? error.message : "未知错误"}`);
   }
 };
 
@@ -57,33 +44,12 @@ export const getTempleById = async (templeId: string): Promise<Temple | null> =>
   try {
     const templeDoc = doc(db, "temples", templeId);
     const docSnap = await getDoc(templeDoc);
-    
+
     if (!docSnap.exists()) {
       return null;
     }
-    
-    const data = docSnap.data();
-    
-    // 处理 GeoPoint 转换
-    let coordinates: [number, number] = [0, 0];
-    if (data.coordinates && data.coordinates instanceof GeoPoint) {
-      coordinates = [data.coordinates.longitude, data.coordinates.latitude];
-    }
-    
-    return {
-      id: docSnap.id,
-      name: data.name || "",
-      location: data.location || "",
-      religion: data.religion || "buddhism",
-      establishedYear: data.establishedYear || 0,
-      status: data.status || "active",
-      description: data.description || "",
-      imageUrl: data.imageUrl || "",
-      coordinates,
-      relatedPeople: data.relatedPeople || [],
-      relatedEvents: data.relatedEvents || []
-    };
-    
+
+    return mapDocToTemple(docSnap.id, docSnap.data() as Record<string, unknown>);
   } catch (error) {
     console.error(`❌ 获取寺庙 ${templeId} 数据时发生错误:`, error);
     throw error;
@@ -97,7 +63,7 @@ export const getTemplesByReligion = async (religions: string[]): Promise<Temple[
   if (religions.length === 0) {
     return getTemples();
   }
-  
+
   try {
     const templesCollection = collection(db, "temples");
     const q = query(
@@ -105,40 +71,20 @@ export const getTemplesByReligion = async (religions: string[]): Promise<Temple[
       where("religion", "in", religions),
       orderBy("establishedYear")
     );
-    
+
     const querySnapshot = await getDocs(q);
     const temples: Temple[] = [];
-    
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      
-      let coordinates: [number, number] = [0, 0];
-      if (data.coordinates && data.coordinates instanceof GeoPoint) {
-        coordinates = [data.coordinates.longitude, data.coordinates.latitude];
-      }
-      
-      temples.push({
-        id: doc.id,
-        name: data.name || "",
-        location: data.location || "",
-        religion: data.religion || "buddhism",
-        establishedYear: data.establishedYear || 0,
-        status: data.status || "active",
-        description: data.description || "",
-        imageUrl: data.imageUrl || "",
-        coordinates,
-        relatedPeople: data.relatedPeople || [],
-        relatedEvents: data.relatedEvents || []
-      });
+
+    querySnapshot.forEach((docSnap) => {
+      temples.push(mapDocToTemple(docSnap.id, docSnap.data() as Record<string, unknown>));
     });
-    
+
     return temples;
-    
   } catch (error) {
     console.error("❌ 根据宗教筛选寺庙时发生错误:", error);
     throw error;
   }
-}; 
+};
 
 /**
  * 全量同步寺庙数据到 Firestore（包含新增、更新、删除）

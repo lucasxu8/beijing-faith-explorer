@@ -1,4 +1,5 @@
-import { X, MapPin, Calendar, Building, ExternalLink, Heart, Share } from "lucide-react";
+import { useEffect, useState } from "react";
+import { X, MapPin, Calendar, Clock, ExternalLink, Heart, Share, ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,16 @@ interface DetailPanelProps {
 }
 
 export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelProps) => {
+  const [imageStatus, setImageStatus] = useState<"loading" | "loaded" | "error">("loading");
+
+  useEffect(() => {
+    if (!temple?.imageUrl?.trim()) {
+      setImageStatus("error");
+      return;
+    }
+    setImageStatus("loading");
+  }, [temple?.id, temple?.imageUrl]);
+
   if (!temple || !isOpen) return null;
 
   const religionConfig = {
@@ -30,6 +41,7 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
 
   const religion = religionConfig[temple.religion];
   const status = statusConfig[temple.status];
+  const imageUrl = temple.imageUrl?.trim() ?? "";
 
   return (
     <div className={`
@@ -67,15 +79,41 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
 
         <CardContent className="space-y-6 px-6 pb-6">
           {/* Main Image */}
-          <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-            <img 
-              src={temple.imageUrl} 
-              alt={temple.name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjMtZjQtZjYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM2LTctOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuWbvueJh+WKoOi9veS4rTwvdGV4dD48L3N2Zz4=";
-              }}
-            />
+          <div className="aspect-video rounded-lg overflow-hidden bg-neutral-200 dark:bg-neutral-800 relative">
+            {imageStatus !== "error" && imageUrl && (
+              <img
+                src={imageUrl}
+                alt={temple.name}
+                className={`w-full h-full object-cover transition-opacity duration-200 ${
+                  imageStatus === "loaded" ? "opacity-100" : "opacity-0"
+                }`}
+                referrerPolicy="no-referrer"
+                loading="lazy"
+                onLoad={() => setImageStatus("loaded")}
+                onError={() => setImageStatus("error")}
+              />
+            )}
+            {imageStatus === "loading" && imageUrl && (
+              <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
+                图片加载中...
+              </div>
+            )}
+            {imageStatus === "error" && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground px-4 text-center">
+                <ImageOff className="h-8 w-8 opacity-60" />
+                <span className="text-sm">图片无法加载</span>
+                {imageUrl && (
+                  <a
+                    href={imageUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-primary hover:underline break-all"
+                  >
+                    在浏览器中打开图片链接
+                  </a>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Basic Information */}
@@ -95,12 +133,18 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
                  temple.establishedYear < 1912 ? " (清代)" : " (近现代)"}
               </span>
             </div>
-            
 
             <div className="flex items-center gap-2 text-sm">
               <div className={`w-3 h-3 rounded-full ${status.color}`} />
               <span className="text-foreground">{status.label}</span>
             </div>
+
+            {temple.openingHours.trim() && (
+              <div className="flex items-start gap-2 text-sm">
+                <Clock className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                <span className="text-foreground">{temple.openingHours}</span>
+              </div>
+            )}
           </div>
 
           <Separator />
@@ -112,6 +156,30 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
               {temple.description}
             </p>
           </div>
+
+          {temple.historicalBackground.trim() && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">历史背景</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {temple.historicalBackground}
+                </p>
+              </div>
+            </>
+          )}
+
+          {temple.architecturalFeatures.trim() && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">建筑特点</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {temple.architecturalFeatures}
+                </p>
+              </div>
+            </>
+          )}
 
           {/* Related People */}
           {temple.relatedPeople.length > 0 && (
