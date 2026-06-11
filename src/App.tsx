@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import CitySelect from "./pages/CitySelect";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { ImportData } from "./pages/ImportData";
@@ -26,7 +27,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<CitySelect />} />
+          <Route path="/beijing" element={<Index />} />
           <Route path="/import-data" element={<ImportData />} />
           <Route path="/data-admin-login" element={<DataAdminLogin />} />
           <Route path="/data-admin" element={<AdminProtectedRoute><DataAdmin /></AdminProtectedRoute>} />

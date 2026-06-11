@@ -215,7 +215,7 @@ export default function DataAdmin() {
             <h1 className="text-2xl font-bold">数据管理后台</h1>
             <p className="text-sm text-muted-foreground">维护寺庙场所数据，支持增删、导入导出和 JSON 编辑。</p>
           </div>
-          <Link to="/">
+          <Link to="/beijing">
             <Button variant="outline">
               <ArrowLeft className="h-4 w-4 mr-2" />
               返回地图

@@ -54,7 +54,7 @@ export default function DataAdminLogin() {
               </div>
             </div>
             <Button type="submit" className="w-full">登录后台</Button>
-            <Link to="/" className="block">
+            <Link to="/beijing" className="block">
               <Button type="button" variant="outline" className="w-full">返回地图</Button>
             </Link>
           </form>

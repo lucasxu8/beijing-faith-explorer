@@ -198,6 +198,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header 
+        cityName="北京"
         onMenuToggle={() => setIsFilterOpen(!isFilterOpen)}
         isMobile={isMobile}
         searchKeyword={searchKeyword}

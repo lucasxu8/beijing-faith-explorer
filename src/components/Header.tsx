@@ -1,10 +1,11 @@
-import { Search, Download, Menu } from "lucide-react";
+import { Search, Download, Menu, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { Temple } from "@/types/temple";
 
 interface HeaderProps {
+  cityName?: string;
   onMenuToggle: () => void;
   isMobile: boolean;
   searchKeyword: string;
@@ -15,6 +16,7 @@ interface HeaderProps {
 }
 
 export const Header = ({
+  cityName = "北京",
   onMenuToggle,
   isMobile,
   searchKeyword,
@@ -38,10 +40,15 @@ export const Header = ({
           </Button>
         )}
         <div className="flex items-center gap-2">
+          <Link to="/">
+            <Button variant="ghost" size="sm" className="hidden sm:flex px-2" title="返回城市选择">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
           <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-sm">信</span>
           </div>
-          <h1 className="text-xl font-bold text-foreground">北京信仰地图</h1>
+          <h1 className="text-xl font-bold text-foreground">{cityName}信仰地图</h1>
         </div>
       </div>
 
