@@ -17,7 +17,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { clearTempleData, generateBeijingTempleId, getTempleData, normalizeTemple, saveTempleData } from "@/lib/templeDataManager";
+import {
+  clearTempleData,
+  formatRelatedPeopleText,
+  generateBeijingTempleId,
+  getTempleData,
+  normalizeTemple,
+  parseRelatedPeopleText,
+  saveTempleData,
+} from "@/lib/templeDataManager";
 import {
   deleteTempleFromFirestore,
   getTemples,
@@ -65,6 +73,13 @@ const EMPTY_FORM = {
   architecturalFeatures: "",
   openingHours: "",
   imageUrl: "",
+  relatedPeopleText: "",
+  volunteers: "",
+  prayerBlessing: "",
+  incenseStatus: "",
+  templeNotes: "",
+  fixedActivitiesFestivals: "",
+  tickets: "",
   lng: 116.404,
   lat: 39.915,
 };
@@ -161,8 +176,14 @@ export default function DataAdmin() {
       openingHours: form.openingHours.trim(),
       imageUrl: form.imageUrl.trim() || "https://images.unsplash.com/photo-1473177104440-ffee2f376098?w=800&h=600&fit=crop",
       coordinates: [Number(form.lng), Number(form.lat)],
-      relatedPeople: [],
+      relatedPeople: parseRelatedPeopleText(form.relatedPeopleText),
       relatedEvents: [],
+      volunteers: form.volunteers.trim(),
+      prayerBlessing: form.prayerBlessing.trim(),
+      incenseStatus: form.incenseStatus.trim(),
+      templeNotes: form.templeNotes.trim(),
+      fixedActivitiesFestivals: form.fixedActivitiesFestivals.trim(),
+      tickets: form.tickets.trim(),
     };
     const next = [...temples, temple];
     await persistTemples(next);
@@ -205,6 +226,13 @@ export default function DataAdmin() {
       imageUrl: temple.imageUrl,
       lng: temple.coordinates[0],
       lat: temple.coordinates[1],
+      relatedPeopleText: formatRelatedPeopleText(temple.relatedPeople),
+      volunteers: temple.volunteers,
+      prayerBlessing: temple.prayerBlessing,
+      incenseStatus: temple.incenseStatus,
+      templeNotes: temple.templeNotes,
+      fixedActivitiesFestivals: temple.fixedActivitiesFestivals,
+      tickets: temple.tickets,
     });
   };
 
@@ -236,6 +264,13 @@ export default function DataAdmin() {
               editingForm.imageUrl.trim() ||
               "https://images.unsplash.com/photo-1473177104440-ffee2f376098?w=800&h=600&fit=crop",
             coordinates: [Number(editingForm.lng), Number(editingForm.lat)] as [number, number],
+            relatedPeople: parseRelatedPeopleText(editingForm.relatedPeopleText),
+            volunteers: editingForm.volunteers.trim(),
+            prayerBlessing: editingForm.prayerBlessing.trim(),
+            incenseStatus: editingForm.incenseStatus.trim(),
+            templeNotes: editingForm.templeNotes.trim(),
+            fixedActivitiesFestivals: editingForm.fixedActivitiesFestivals.trim(),
+            tickets: editingForm.tickets.trim(),
           }
         : temple
     );
@@ -466,6 +501,57 @@ export default function DataAdmin() {
                     onChange={(e) => setForm((p) => ({ ...p, openingHours: e.target.value }))}
                   />
                 </Field>
+
+                <Field label="相关人物（可选，多个用逗号分隔）" htmlFor="add-people">
+                  <Textarea
+                    id="add-people"
+                    value={form.relatedPeopleText}
+                    onChange={(e) => setForm((p) => ({ ...p, relatedPeopleText: e.target.value }))}
+                  />
+                </Field>
+                <Field label="义工情况（可选）" htmlFor="add-volunteers">
+                  <Textarea
+                    id="add-volunteers"
+                    value={form.volunteers}
+                    onChange={(e) => setForm((p) => ({ ...p, volunteers: e.target.value }))}
+                  />
+                </Field>
+                <Field label="祈福方式（可选）" htmlFor="add-prayer">
+                  <Textarea
+                    id="add-prayer"
+                    value={form.prayerBlessing}
+                    onChange={(e) => setForm((p) => ({ ...p, prayerBlessing: e.target.value }))}
+                  />
+                </Field>
+                <Field label="香火情况（可选）" htmlFor="add-incense">
+                  <Textarea
+                    id="add-incense"
+                    value={form.incenseStatus}
+                    onChange={(e) => setForm((p) => ({ ...p, incenseStatus: e.target.value }))}
+                  />
+                </Field>
+                <Field label="寺庙注意事项（可选）" htmlFor="add-notes">
+                  <Textarea
+                    id="add-notes"
+                    value={form.templeNotes}
+                    onChange={(e) => setForm((p) => ({ ...p, templeNotes: e.target.value }))}
+                  />
+                </Field>
+                <Field label="固定活动 / 重大佛教节日（可选）" htmlFor="add-festivals">
+                  <Textarea
+                    id="add-festivals"
+                    value={form.fixedActivitiesFestivals}
+                    onChange={(e) => setForm((p) => ({ ...p, fixedActivitiesFestivals: e.target.value }))}
+                  />
+                </Field>
+                <Field label="门票（可选）" htmlFor="add-tickets">
+                  <Input
+                    id="add-tickets"
+                    value={form.tickets}
+                    onChange={(e) => setForm((p) => ({ ...p, tickets: e.target.value }))}
+                  />
+                </Field>
+
                 <Button onClick={handleAddTemple} disabled={isSyncing} className="w-fit">
                   <Plus className="h-4 w-4 mr-2" />
                   添加场所
@@ -532,6 +618,15 @@ export default function DataAdmin() {
                         <Textarea className="md:col-span-2" placeholder="历史背景" value={editingForm.historicalBackground} onChange={(e) => setEditingForm((prev) => ({ ...prev, historicalBackground: e.target.value }))} />
                         <Textarea className="md:col-span-2" placeholder="建筑特点" value={editingForm.architecturalFeatures} onChange={(e) => setEditingForm((prev) => ({ ...prev, architecturalFeatures: e.target.value }))} />
                         <Input className="md:col-span-2" placeholder="开放时间" value={editingForm.openingHours} onChange={(e) => setEditingForm((prev) => ({ ...prev, openingHours: e.target.value }))} />
+
+                        <Textarea className="md:col-span-2" placeholder="相关人物（逗号分隔）" value={editingForm.relatedPeopleText} onChange={(e) => setEditingForm((prev) => ({ ...prev, relatedPeopleText: e.target.value }))} />
+                        <Textarea className="md:col-span-2" placeholder="义工情况" value={editingForm.volunteers} onChange={(e) => setEditingForm((prev) => ({ ...prev, volunteers: e.target.value }))} />
+                        <Textarea className="md:col-span-2" placeholder="祈福方式" value={editingForm.prayerBlessing} onChange={(e) => setEditingForm((prev) => ({ ...prev, prayerBlessing: e.target.value }))} />
+                        <Textarea className="md:col-span-2" placeholder="香火情况" value={editingForm.incenseStatus} onChange={(e) => setEditingForm((prev) => ({ ...prev, incenseStatus: e.target.value }))} />
+                        <Textarea className="md:col-span-2" placeholder="寺庙注意事项" value={editingForm.templeNotes} onChange={(e) => setEditingForm((prev) => ({ ...prev, templeNotes: e.target.value }))} />
+                        <Textarea className="md:col-span-2" placeholder="固定活动 / 重大佛教节日" value={editingForm.fixedActivitiesFestivals} onChange={(e) => setEditingForm((prev) => ({ ...prev, fixedActivitiesFestivals: e.target.value }))} />
+                        <Input className="md:col-span-2" placeholder="门票" value={editingForm.tickets} onChange={(e) => setEditingForm((prev) => ({ ...prev, tickets: e.target.value }))} />
+
                       </div>
                     ) : (
                       <div>

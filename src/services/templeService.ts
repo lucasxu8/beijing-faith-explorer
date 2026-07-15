@@ -55,6 +55,12 @@ const toFirestorePayload = (temple: Temple) => {
     imageUrl: temple.imageUrl ?? "",
     relatedPeople: Array.isArray(temple.relatedPeople) ? temple.relatedPeople : [],
     relatedEvents: Array.isArray(temple.relatedEvents) ? temple.relatedEvents : [],
+    volunteers: temple.volunteers ?? "",
+    prayerBlessing: temple.prayerBlessing ?? "",
+    incenseStatus: temple.incenseStatus ?? "",
+    templeNotes: temple.templeNotes ?? "",
+    fixedActivitiesFestivals: temple.fixedActivitiesFestivals ?? "",
+    tickets: temple.tickets ?? "",
     coordinates: new GeoPoint(lat, lng),
   });
 };

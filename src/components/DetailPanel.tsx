@@ -181,7 +181,6 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
             </>
           )}
 
-          {/* Related People */}
           {temple.relatedPeople.length > 0 && (
             <>
               <Separator />
@@ -194,6 +193,78 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
                     </Badge>
                   ))}
                 </div>
+              </div>
+            </>
+          )}
+
+          {temple.volunteers.trim() && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">义工情况</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {temple.volunteers}
+                </p>
+              </div>
+            </>
+          )}
+
+          {temple.prayerBlessing.trim() && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">祈福方式</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {temple.prayerBlessing}
+                </p>
+              </div>
+            </>
+          )}
+
+          {temple.incenseStatus.trim() && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">香火情况</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {temple.incenseStatus}
+                </p>
+              </div>
+            </>
+          )}
+
+          {temple.templeNotes.trim() && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">寺庙注意事项</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {temple.templeNotes}
+                </p>
+              </div>
+            </>
+          )}
+
+          {temple.fixedActivitiesFestivals.trim() && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">固定活动 / 重大节日</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {temple.fixedActivitiesFestivals}
+                </p>
+              </div>
+            </>
+          )}
+
+          {temple.tickets.trim() && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">门票</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {temple.tickets}
+                </p>
               </div>
             </>
           )}

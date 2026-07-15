@@ -21,7 +21,8 @@ export const citiesData: City[] = [
     name: "上海",
     description: "近代开埠城市，中西宗教建筑并存。",
     highlights: ["徐家汇天主堂", "静安寺", "小桃园清真寺"],
-    available: false,
+    route: "/shanghai",
+    available: true,
   },
   {
     id: "xian",

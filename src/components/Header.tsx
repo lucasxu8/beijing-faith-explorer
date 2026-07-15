@@ -6,6 +6,7 @@ import { Temple } from "@/types/temple";
 
 interface HeaderProps {
   cityName?: string;
+  adminLoginPath?: string;
   onMenuToggle: () => void;
   isMobile: boolean;
   searchKeyword: string;
@@ -17,6 +18,7 @@ interface HeaderProps {
 
 export const Header = ({
   cityName = "北京",
+  adminLoginPath = "/data-admin-login",
   onMenuToggle,
   isMobile,
   searchKeyword,
@@ -89,7 +91,7 @@ export const Header = ({
           <Download className="h-4 w-4 mr-2" />
           导出数据
         </Button>
-        <Link to="/data-admin-login">
+        <Link to={adminLoginPath}>
           <Button variant="outline" size="sm" className="hidden sm:flex">
             数据后台
           </Button>

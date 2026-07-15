@@ -5,17 +5,26 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import CitySelect from "./pages/CitySelect";
 import Index from "./pages/Index";
+import ShanghaiIndex from "./pages/ShanghaiIndex";
 import NotFound from "./pages/NotFound";
 import { ImportData } from "./pages/ImportData";
 import DataAdmin from "./pages/DataAdmin";
 import DataAdminLogin from "./pages/DataAdminLogin";
+import ShanghaiDataAdmin from "./pages/ShanghaiDataAdmin";
+import ShanghaiDataAdminLogin from "./pages/ShanghaiDataAdminLogin";
 import { isAdminAuthenticated } from "./lib/adminAuth";
 
 const queryClient = new QueryClient();
 
-const AdminProtectedRoute = ({ children }: { children: JSX.Element }) => {
+const AdminProtectedRoute = ({
+  children,
+  loginPath,
+}: {
+  children: JSX.Element;
+  loginPath: string;
+}) => {
   if (!isAdminAuthenticated()) {
-    return <Navigate to="/data-admin-login" replace />;
+    return <Navigate to={loginPath} replace />;
   }
   return children;
 };
@@ -29,10 +38,26 @@ const App = () => (
         <Routes>
           <Route path="/" element={<CitySelect />} />
           <Route path="/beijing" element={<Index />} />
+          <Route path="/shanghai" element={<ShanghaiIndex />} />
           <Route path="/import-data" element={<ImportData />} />
           <Route path="/data-admin-login" element={<DataAdminLogin />} />
-          <Route path="/data-admin" element={<AdminProtectedRoute><DataAdmin /></AdminProtectedRoute>} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route
+            path="/data-admin"
+            element={
+              <AdminProtectedRoute loginPath="/data-admin-login">
+                <DataAdmin />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route path="/shanghai/data-admin-login" element={<ShanghaiDataAdminLogin />} />
+          <Route
+            path="/shanghai/data-admin"
+            element={
+              <AdminProtectedRoute loginPath="/shanghai/data-admin-login">
+                <ShanghaiDataAdmin />
+              </AdminProtectedRoute>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

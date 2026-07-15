@@ -51,6 +51,12 @@ const Index = () => {
             temple.historicalBackground,
             temple.architecturalFeatures,
             temple.openingHours,
+            temple.volunteers,
+            temple.prayerBlessing,
+            temple.incenseStatus,
+            temple.templeNotes,
+            temple.fixedActivitiesFestivals,
+            temple.tickets,
             ...temple.relatedPeople,
             ...temple.relatedEvents,
           ]
@@ -86,6 +92,12 @@ const Index = () => {
         temple.openingHours,
         temple.religion,
         String(temple.establishedYear),
+        temple.volunteers,
+        temple.prayerBlessing,
+        temple.incenseStatus,
+        temple.templeNotes,
+        temple.fixedActivitiesFestivals,
+        temple.tickets,
         ...temple.relatedPeople,
         ...temple.relatedEvents,
       ]
@@ -202,6 +214,7 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50">
       <Header 
         cityName="北京"
+        adminLoginPath="/data-admin-login"
         onMenuToggle={() => setIsFilterOpen(!isFilterOpen)}
         isMobile={isMobile}
         searchKeyword={searchKeyword}
@@ -227,6 +240,7 @@ const Index = () => {
         />
         <div className="flex-1 flex flex-col relative">
           <MapView 
+            cityId="beijing"
             currentYear={currentYear}
             onTempleSelect={handleTempleSelect}
             selectedTemple={selectedTemple}
@@ -247,7 +261,7 @@ const Index = () => {
       {/* 数据状态显示 */}
       <div className="fixed bottom-4 left-4 glass-panel p-3 z-10 rounded-lg text-sm">
         <span className="text-muted-foreground">
-          数据来源: Firestore{isFetching ? "（同步中）" : ""} | 显示 {filteredTemples.length} / {sourceTemples.length} 个场所
+          数据来源: Firestore beijing_temples{isFetching ? "（同步中）" : ""} | 显示 {filteredTemples.length} / {sourceTemples.length} 个场所
         </span>
       </div>
     </div>

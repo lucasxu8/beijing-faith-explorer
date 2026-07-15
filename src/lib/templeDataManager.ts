@@ -20,11 +20,28 @@ const isTempleLike = (value: unknown): value is Record<string, unknown> => {
     Array.isArray(coordinates) &&
     coordinates.length === 2 &&
     typeof coordinates[0] === "number" &&
-    typeof coordinates[1] === "number" &&
-    Array.isArray(candidate.relatedPeople) &&
-    Array.isArray(candidate.relatedEvents)
+    typeof coordinates[1] === "number"
   );
 };
+
+const parseStringList = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item).trim()).filter(Boolean);
+  }
+  if (typeof value === "string") {
+    return value
+      .split(/[,，\n]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+};
+
+/** 将相关人物数组转为表单文本 */
+export const formatRelatedPeopleText = (people: string[]): string => people.join("，");
+
+/** 将表单文本解析为相关人物数组 */
+export const parseRelatedPeopleText = (text: string): string[] => parseStringList(text);
 
 /** 将部分/旧数据规范为完整 Temple（兼容缺省字段与中文字段名） */
 export const normalizeTemple = (raw: Record<string, unknown>): Temple => {
@@ -46,8 +63,16 @@ export const normalizeTemple = (raw: Record<string, unknown>): Temple => {
     openingHours: String(raw.openingHours ?? raw["开放时间"] ?? ""),
     imageUrl: String(raw.imageUrl ?? ""),
     coordinates,
-    relatedPeople: (raw.relatedPeople as string[]) ?? [],
-    relatedEvents: (raw.relatedEvents as string[]) ?? [],
+    relatedPeople: parseStringList(raw.relatedPeople ?? raw["相关人物"]),
+    relatedEvents: parseStringList(raw.relatedEvents ?? raw["相关事件"]),
+    volunteers: String(raw.volunteers ?? raw["义工情况"] ?? ""),
+    prayerBlessing: String(raw.prayerBlessing ?? raw["祈福方式"] ?? ""),
+    incenseStatus: String(raw.incenseStatus ?? raw["香火情况"] ?? ""),
+    templeNotes: String(raw.templeNotes ?? raw["寺庙注意事项"] ?? ""),
+    fixedActivitiesFestivals: String(
+      raw.fixedActivitiesFestivals ?? raw["固定活动/重大佛教节日"] ?? raw["固定活动"] ?? ""
+    ),
+    tickets: String(raw.tickets ?? raw["门票"] ?? ""),
   };
 };
 
@@ -69,7 +94,6 @@ export const generateBeijingTempleId = (
     }
   }
 
-  // 若尚无规范 ID，则从该宗教现有条数起算，减少与旧数据并存时的重号风险
   if (maxSeq === 0) {
     maxSeq = existing.filter((temple) => temple.religion === religion).length;
   }

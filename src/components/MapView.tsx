@@ -2,23 +2,33 @@ import { useEffect, useRef, useState } from "react";
 import { Layers, ZoomIn, ZoomOut, Locate, RotateCcw, Navigation, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Temple } from "@/types/temple";
+import { cityMapConfigs, type CityMapId } from "@/data/cityMapConfigs";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface MapViewProps {
+  cityId?: CityMapId;
   currentYear: number;
   onTempleSelect: (temple: Temple) => void;
   selectedTemple: Temple | null;
   selectedReligions?: string[];
-  temples: Temple[]; // 新增：从父组件接收寺庙数据
+  temples: Temple[];
 }
 
-export const MapView = ({ currentYear, onTempleSelect, selectedTemple, selectedReligions = [], temples }: MapViewProps) => {
+export const MapView = ({
+  cityId = "beijing",
+  currentYear,
+  onTempleSelect,
+  selectedTemple,
+  selectedReligions = [],
+  temples,
+}: MapViewProps) => {
+  const mapConfig = cityMapConfigs[cityId];
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
   const [mapStyle, setMapStyle] = useState<'vintage' | 'terrain'>('vintage');
-  const [zoom, setZoom] = useState(10);
+  const [zoom, setZoom] = useState(mapConfig.zoom);
   const [showClusters, setShowClusters] = useState(true);
   const [mapboxToken, setMapboxToken] = useState('pk.eyJ1IjoiZmFpdGhtYXAiLCJhIjoiY21kNGIwdGhoMGYyczJrb29xMXRtdXJndCJ9.rmmK4c2BTfqFvwNmpXcLhQ');
 
@@ -65,19 +75,16 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple, selectedR
     // Set access token
     mapboxgl.accessToken = mapboxToken;
 
-    // Initialize map focused on Chongqing area
+    // Initialize map for the selected city
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: getMapboxStyle(mapStyle),
-      center: [116.40, 39.90], // Chongqing center
-      zoom: 11, // 更适合重庆市区的缩放级别
-      pitch: 0, // 减少倾斜角度
+      center: mapConfig.center,
+      zoom: mapConfig.zoom,
+      pitch: 0,
       bearing: 0,
       antialias: true,
-      maxBounds: [
-      [115.0, 39.4], // 西南
-      [117.2, 40.5]  // 东北
-      ] // 限制地图范围在重庆周边
+      maxBounds: mapConfig.maxBounds,
     });
 
     console.log('Map initialized');
@@ -112,7 +119,7 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple, selectedR
       markers.current = [];
       map.current?.remove();
     };
-  }, [mapboxToken, mapStyle]);
+  }, [mapboxToken, mapStyle, cityId]);
 
   // Update markers when temples or filters change
   useEffect(() => {
@@ -296,8 +303,8 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple, selectedR
           onClick={() => {
             if (map.current) {
               map.current.flyTo({
-                center: [106.5805, 29.5647],
-                zoom: 10,
+                center: mapConfig.center,
+                zoom: mapConfig.zoom,
                 duration: 1000
               });
             }
