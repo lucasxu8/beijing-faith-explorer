@@ -24,7 +24,10 @@ interface FilterPanelProps {
   onReligionFilter?: (religions: string[]) => void;
   selectedPeriods?: string[];
   onPeriodFilter?: (periods: string[]) => void;
+  /** 全量（用于筛选选项计数） */
   temples: Temple[];
+  /** 当前筛选结果（寺庙列表与地图一致）；未传则回退到 temples */
+  listTemples?: Temple[];
 }
 
 export const FilterPanel = ({
@@ -39,30 +42,28 @@ export const FilterPanel = ({
   selectedPeriods = [],
   onPeriodFilter,
   temples,
+  listTemples,
 }: FilterPanelProps) => {
+  const templeListItems = listTemples ?? temples;
   const [expandedSections, setExpandedSections] = useState({
     templeList: true,
     religion: true,
     period: true,
   });
   const religionMeta: Record<string, { label: string; color: string }> = {
-    buddhism: { label: "佛教", color: "bg-orange-500" },
-    catholic: { label: "天主教", color: "bg-purple-500" },
-    islam: { label: "伊斯兰教", color: "bg-green-500" },
+    buddhism: { label: "佛教寺庙", color: "bg-orange-500" },
+    taoism: { label: "道教", color: "bg-teal-500" },
+    catholic: { label: "天主教堂", color: "bg-purple-500" },
+    islam: { label: "伊斯兰清真寺", color: "bg-green-500" },
   };
 
-  const religionOrder = ["buddhism", "catholic", "islam"];
-  const religions: FilterOption[] = religionOrder.reduce<FilterOption[]>((acc, religionId) => {
-    const count = temples.filter((temple) => temple.religion === religionId).length;
-    if (count === 0) return acc;
-    acc.push({
-      id: religionId,
-      label: religionMeta[religionId].label,
-      count,
-      color: religionMeta[religionId].color,
-    });
-    return acc;
-  }, []);
+  const religionOrder = ["buddhism", "taoism", "catholic", "islam"];
+  const religions: FilterOption[] = religionOrder.map((religionId) => ({
+    id: religionId,
+    label: religionMeta[religionId].label,
+    count: temples.filter((temple) => temple.religion === religionId).length,
+    color: religionMeta[religionId].color,
+  }));
 
   const periods: FilterOption[] = [
     {
@@ -124,10 +125,16 @@ export const FilterPanel = ({
 
   const getReligionIcon = (religionId: string) => {
     switch (religionId) {
-      case 'buddhism': return '🏯';
-      case 'catholic': return '⛪';
-      case 'islam': return '🕌';
-      default: return '🏛️';
+      case "buddhism":
+        return "🏯";
+      case "taoism":
+        return "⛩️";
+      case "catholic":
+        return "⛪";
+      case "islam":
+        return "🕌";
+      default:
+        return "🏛️";
     }
   };
 
@@ -246,25 +253,29 @@ export const FilterPanel = ({
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-4">
             <div className="space-y-2 max-h-60 overflow-y-auto">
-              {temples.slice(0, 9).map((temple) => (
-                <div
-                  key={temple.id}
-                  className="p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
-                  onClick={() => onTempleSelect?.(temple)}
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-lg">
-                      {temple.religion === 'buddhism' ? '🏯' :
-                       temple.religion === 'taoism' ? '⛩️' :
-                       temple.religion === 'catholic' ? '⛪' : '🕌'}
-                    </span>
-                    <span className="font-medium text-sm">{temple.name}</span>
+              {templeListItems.length === 0 ? (
+                <p className="text-xs text-muted-foreground px-1 py-2">当前筛选条件下没有场所</p>
+              ) : (
+                templeListItems.map((temple) => (
+                  <div
+                    key={temple.id}
+                    className="p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
+                    onClick={() => onTempleSelect?.(temple)}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-lg">
+                        {temple.religion === 'buddhism' ? '🏯' :
+                         temple.religion === 'taoism' ? '⛩️' :
+                         temple.religion === 'catholic' ? '⛪' : '🕌'}
+                      </span>
+                      <span className="font-medium text-sm">{temple.name}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {temple.location} • {temple.establishedYear}年
+                    </div>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    {temple.location} • {temple.establishedYear}年
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CollapsibleContent>
         </Collapsible>

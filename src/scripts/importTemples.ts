@@ -9,8 +9,8 @@ export async function importTemples() {
   console.log("开始导入寺庙数据到 Firestore...");
   
   try {
-    // 获取 temples 集合的引用
-    const templesCollection = collection(db, "temples");
+    // 获取 beijing_temples 集合的引用
+    const templesCollection = collection(db, "beijing_temples");
     
     // 遍历所有寺庙数据
     for (const temple of templesData) {

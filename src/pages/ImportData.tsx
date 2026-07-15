@@ -47,8 +47,8 @@ export const ImportData = () => {
               导入寺庙数据
             </CardTitle>
             <CardDescription>
-              这将会把所有 {templesData.length} 个重庆地区的宗教场所数据导入到您的 Firestore 数据库中。
-              每个场所将作为一个单独的文档存储在 "temples" 集合中。
+              这将会把所有 {templesData.length} 个北京地区的宗教场所数据导入到您的 Firestore 数据库中。
+              每个场所将作为一个单独的文档存储在 "beijing_temples" 集合中。
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

@@ -3,7 +3,7 @@ import { Temple } from "@/types/temple";
 // Beijing Faith Map Data
 export const templesData: Temple[] = [
   {
-    id: "church_001",
+    id: "beijing_temples_catholic_001",
     name: "St. Joseph’s Cathedral 东堂（王府井天主教堂）",
     location: "北京市东城区王府井大街74号",
     religion: "catholic",
@@ -21,7 +21,7 @@ export const templesData: Temple[] = [
     relatedEvents: ["1655年建立", "1900年被毁", "1904年重建"],
   },
   {
-    id: "temple_001",
+    id: "beijing_temples_buddhism_001",
     name: "雍和宫",
     location: "北京市东城区雍和宫大街12号",
     religion: "buddhism",
@@ -39,7 +39,7 @@ export const templesData: Temple[] = [
     relatedEvents: ["1694年建成", "1722年改为行宫", "1744年改为寺庙"],
   },
   {
-    id: "temple_002",
+    id: "beijing_temples_taoism_001",
     name: "白云观",
     location: "北京市西城区白云观街9号",
     religion: "taoism",
@@ -57,7 +57,7 @@ export const templesData: Temple[] = [
     relatedEvents: ["唐代创建", "元代扩建", "现存建筑多为明清时期"],
   },
   {
-    id: "mosque_001",
+    id: "beijing_temples_islam_001",
     name: "牛街清真寺",
     location: "北京市西城区牛街18号",
     religion: "islam",
@@ -75,7 +75,7 @@ export const templesData: Temple[] = [
     relatedEvents: ["辽代创建", "明清多次修缮"],
   },
   {
-    id: "church_002",
+    id: "beijing_temples_catholic_002",
     name: "崇文门基督教堂",
     location: "北京市东城区崇文门内大街",
     religion: "catholic",

@@ -1,15 +1,58 @@
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Download, Plus, Save, Trash2, Upload } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Download, Loader2, Plus, RefreshCw, Save, Trash2, Upload } from "lucide-react";
 import { Temple } from "@/types/temple";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { clearTempleData, getTempleData, normalizeTemple, saveTempleData } from "@/lib/templeDataManager";
-import { syncTemplesToFirestore } from "@/services/templeService";
+import { clearTempleData, generateBeijingTempleId, getTempleData, normalizeTemple, saveTempleData } from "@/lib/templeDataManager";
+import {
+  deleteTempleFromFirestore,
+  getTemples,
+  syncTemplesToFirestore,
+} from "@/services/templeService";
+
+const RELIGION_OPTIONS: { value: Temple["religion"]; label: string }[] = [
+  { value: "buddhism", label: "佛教寺庙 (buddhism)" },
+  { value: "taoism", label: "道教 (taoism)" },
+  { value: "catholic", label: "天主教 (catholic)" },
+  { value: "islam", label: "伊斯兰教 (islam)" },
+];
+
+const STATUS_OPTIONS: { value: Temple["status"]; label: string }[] = [
+  { value: "active", label: "正常开放 (active)" },
+  { value: "renovation", label: "修缮中 (renovation)" },
+  { value: "ruins", label: "遗址 (ruins)" },
+];
+
+const Field = ({
+  label,
+  htmlFor,
+  children,
+}: {
+  label: string;
+  htmlFor?: string;
+  children: ReactNode;
+}) => (
+  <div className="flex flex-col gap-1.5">
+    <Label htmlFor={htmlFor} className="text-sm font-medium text-foreground">
+      {label}
+    </Label>
+    {children}
+  </div>
+);
 
 const EMPTY_FORM = {
   name: "",
@@ -27,12 +70,50 @@ const EMPTY_FORM = {
 };
 
 export default function DataAdmin() {
-  const [temples, setTemples] = useState<Temple[]>(() => getTempleData());
+  const queryClient = useQueryClient();
+  const [temples, setTemples] = useState<Temple[]>([]);
   const [jsonText, setJsonText] = useState("");
   const [form, setForm] = useState(EMPTY_FORM);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [editingTempleId, setEditingTempleId] = useState<string | null>(null);
   const [editingForm, setEditingForm] = useState(EMPTY_FORM);
+
+  const invalidateMapCache = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: ["beijing-temples"] });
+  }, [queryClient]);
+
+  const loadFromFirestore = useCallback(async (silent = false) => {
+    setIsLoading(true);
+    try {
+      const remote = await getTemples();
+      setTemples(remote);
+      saveTempleData(remote);
+      if (!silent) {
+        toast({
+          title: "已加载 Firestore 数据",
+          description: `共 ${remote.length} 条场所记录。`,
+        });
+      }
+    } catch (error) {
+      const cached = getTempleData();
+      setTemples(cached);
+      toast({
+        title: "Firestore 加载失败",
+        description:
+          error instanceof Error
+            ? `${error.message}（已回退本地缓存 ${cached.length} 条）`
+            : "已回退本地缓存",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadFromFirestore(true);
+  }, [loadFromFirestore]);
 
   useEffect(() => {
     setJsonText(JSON.stringify(temples, null, 2));
@@ -49,6 +130,7 @@ export default function DataAdmin() {
     setIsSyncing(true);
     try {
       await syncTemplesToFirestore(next);
+      invalidateMapCache();
       toast({ title: "已同步到 Firebase", description: `当前共 ${next.length} 条记录。` });
     } catch (error) {
       toast({
@@ -67,7 +149,7 @@ export default function DataAdmin() {
       return;
     }
     const temple: Temple = {
-      id: `custom_${Date.now()}`,
+      id: generateBeijingTempleId(form.religion, temples),
       name: form.name.trim(),
       location: form.location.trim(),
       religion: form.religion,
@@ -85,12 +167,27 @@ export default function DataAdmin() {
     const next = [...temples, temple];
     await persistTemples(next);
     setForm(EMPTY_FORM);
-    toast({ title: "已新增场所", description: temple.name });
+    toast({ title: "已新增场所", description: `${temple.name}（ID: ${temple.id}）` });
   };
 
   const handleDeleteTemple = async (id: string) => {
     const next = temples.filter((temple) => temple.id !== id);
-    await persistTemples(next);
+    setTemples(next);
+    saveTempleData(next);
+    setIsSyncing(true);
+    try {
+      await deleteTempleFromFirestore(id);
+      invalidateMapCache();
+      toast({ title: "已删除并同步到 Firebase", description: `剩余 ${next.length} 条记录。` });
+    } catch (error) {
+      toast({
+        title: "Firebase 同步失败",
+        description: error instanceof Error ? error.message : "请检查 Firebase 配置与网络",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const handleStartEditTemple = (temple: Temple) => {
@@ -210,19 +307,41 @@ export default function DataAdmin() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
             <h1 className="text-2xl font-bold">数据管理后台</h1>
-            <p className="text-sm text-muted-foreground">维护寺庙场所数据，支持增删、导入导出和 JSON 编辑。</p>
+            <p className="text-sm text-muted-foreground">
+              以 Firestore（beijing_temples）为准展示与编辑场所；修改后地图与筛选列表会同步更新。
+            </p>
           </div>
-          <Link to="/beijing">
-            <Button variant="outline">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              返回地图
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => void loadFromFirestore()}
+              disabled={isLoading || isSyncing}
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4 mr-2" />
+              )}
+              从 Firestore 刷新
             </Button>
-          </Link>
+            <Link to="/beijing">
+              <Button variant="outline">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                返回地图
+              </Button>
+            </Link>
+          </div>
         </div>
 
+        {isLoading && temples.length === 0 ? (
+          <div className="flex items-center justify-center py-20 text-muted-foreground gap-2">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            正在从 Firestore 加载寺庙数据…
+          </div>
+        ) : (
         <Tabs defaultValue="list" className="space-y-4">
           <TabsList>
             <TabsTrigger value="list">列表管理</TabsTrigger>
@@ -235,25 +354,122 @@ export default function DataAdmin() {
               <CardHeader>
                 <CardTitle>新增场所</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Input placeholder="名称" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} />
-                <Input placeholder="地点" value={form.location} onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))} />
-                <Input placeholder="宗教(buddhism/catholic/islam/taoism)" value={form.religion} onChange={(e) => setForm((p) => ({ ...p, religion: e.target.value as Temple["religion"] }))} />
-                <Input placeholder="建立年份" type="number" value={form.establishedYear} onChange={(e) => setForm((p) => ({ ...p, establishedYear: Number(e.target.value) }))} />
-                <Input placeholder="状态(active/renovation/ruins)" value={form.status} onChange={(e) => setForm((p) => ({ ...p, status: e.target.value as Temple["status"] }))} />
-                <Input placeholder="图片URL(可选)" value={form.imageUrl} onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))} />
-                <Input placeholder="经度" type="number" value={form.lng} onChange={(e) => setForm((p) => ({ ...p, lng: Number(e.target.value) }))} />
-                <Input placeholder="纬度" type="number" value={form.lat} onChange={(e) => setForm((p) => ({ ...p, lat: Number(e.target.value) }))} />
-                <Textarea className="md:col-span-2" placeholder="简介(可选)" value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} />
-                <Textarea className="md:col-span-2" placeholder="历史背景(可选)" value={form.historicalBackground} onChange={(e) => setForm((p) => ({ ...p, historicalBackground: e.target.value }))} />
-                <Textarea className="md:col-span-2" placeholder="建筑特点(可选)" value={form.architecturalFeatures} onChange={(e) => setForm((p) => ({ ...p, architecturalFeatures: e.target.value }))} />
-                <Input className="md:col-span-2" placeholder="开放时间(可选)" value={form.openingHours} onChange={(e) => setForm((p) => ({ ...p, openingHours: e.target.value }))} />
-                <div className="md:col-span-2">
-                  <Button onClick={handleAddTemple} disabled={isSyncing}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    添加场所
-                  </Button>
-                </div>
+              <CardContent className="flex flex-col gap-4 max-w-xl">
+                <Field label="名称" htmlFor="add-name">
+                  <Input
+                    id="add-name"
+                    value={form.name}
+                    onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                  />
+                </Field>
+                <Field label="地点" htmlFor="add-location">
+                  <Input
+                    id="add-location"
+                    value={form.location}
+                    onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))}
+                  />
+                </Field>
+                <Field label="宗教类型">
+                  <Select
+                    value={form.religion}
+                    onValueChange={(value) =>
+                      setForm((p) => ({ ...p, religion: value as Temple["religion"] }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {RELIGION_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label="建立年份" htmlFor="add-year">
+                  <Input
+                    id="add-year"
+                    type="number"
+                    value={form.establishedYear}
+                    onChange={(e) => setForm((p) => ({ ...p, establishedYear: Number(e.target.value) }))}
+                  />
+                </Field>
+                <Field label="状态">
+                  <Select
+                    value={form.status}
+                    onValueChange={(value) =>
+                      setForm((p) => ({ ...p, status: value as Temple["status"] }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STATUS_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label="图片 URL（可选）" htmlFor="add-image">
+                  <Input
+                    id="add-image"
+                    value={form.imageUrl}
+                    onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))}
+                  />
+                </Field>
+                <Field label="经度" htmlFor="add-lng">
+                  <Input
+                    id="add-lng"
+                    type="number"
+                    value={form.lng}
+                    onChange={(e) => setForm((p) => ({ ...p, lng: Number(e.target.value) }))}
+                  />
+                </Field>
+                <Field label="纬度" htmlFor="add-lat">
+                  <Input
+                    id="add-lat"
+                    type="number"
+                    value={form.lat}
+                    onChange={(e) => setForm((p) => ({ ...p, lat: Number(e.target.value) }))}
+                  />
+                </Field>
+                <Field label="简介（可选）" htmlFor="add-description">
+                  <Textarea
+                    id="add-description"
+                    value={form.description}
+                    onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
+                  />
+                </Field>
+                <Field label="历史背景（可选）" htmlFor="add-history">
+                  <Textarea
+                    id="add-history"
+                    value={form.historicalBackground}
+                    onChange={(e) => setForm((p) => ({ ...p, historicalBackground: e.target.value }))}
+                  />
+                </Field>
+                <Field label="建筑特点（可选）" htmlFor="add-architecture">
+                  <Textarea
+                    id="add-architecture"
+                    value={form.architecturalFeatures}
+                    onChange={(e) => setForm((p) => ({ ...p, architecturalFeatures: e.target.value }))}
+                  />
+                </Field>
+                <Field label="开放时间（可选）" htmlFor="add-hours">
+                  <Input
+                    id="add-hours"
+                    value={form.openingHours}
+                    onChange={(e) => setForm((p) => ({ ...p, openingHours: e.target.value }))}
+                  />
+                </Field>
+                <Button onClick={handleAddTemple} disabled={isSyncing} className="w-fit">
+                  <Plus className="h-4 w-4 mr-2" />
+                  添加场所
+                </Button>
               </CardContent>
             </Card>
 
@@ -268,9 +484,47 @@ export default function DataAdmin() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                         <Input value={editingForm.name} onChange={(e) => setEditingForm((prev) => ({ ...prev, name: e.target.value }))} />
                         <Input value={editingForm.location} onChange={(e) => setEditingForm((prev) => ({ ...prev, location: e.target.value }))} />
-                        <Input value={editingForm.religion} onChange={(e) => setEditingForm((prev) => ({ ...prev, religion: e.target.value as Temple["religion"] }))} />
+                        <Select
+                          value={editingForm.religion}
+                          onValueChange={(value) =>
+                            setEditingForm((prev) => ({
+                              ...prev,
+                              religion: value as Temple["religion"],
+                            }))
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="选择宗教类型" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {RELIGION_OPTIONS.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <Input type="number" value={editingForm.establishedYear} onChange={(e) => setEditingForm((prev) => ({ ...prev, establishedYear: Number(e.target.value) }))} />
-                        <Input value={editingForm.status} onChange={(e) => setEditingForm((prev) => ({ ...prev, status: e.target.value as Temple["status"] }))} />
+                        <Select
+                          value={editingForm.status}
+                          onValueChange={(value) =>
+                            setEditingForm((prev) => ({
+                              ...prev,
+                              status: value as Temple["status"],
+                            }))
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="选择状态" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {STATUS_OPTIONS.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <Input value={editingForm.imageUrl} onChange={(e) => setEditingForm((prev) => ({ ...prev, imageUrl: e.target.value }))} />
                         <Input type="number" value={editingForm.lng} onChange={(e) => setEditingForm((prev) => ({ ...prev, lng: Number(e.target.value) }))} />
                         <Input type="number" value={editingForm.lat} onChange={(e) => setEditingForm((prev) => ({ ...prev, lat: Number(e.target.value) }))} />
@@ -282,7 +536,9 @@ export default function DataAdmin() {
                     ) : (
                       <div>
                         <div className="font-medium">{temple.name}</div>
-                        <div className="text-xs text-muted-foreground">{temple.location} | {temple.establishedYear} | {temple.religion}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {temple.id} | {temple.location} | {temple.establishedYear} | {temple.religion}
+                        </div>
                       </div>
                     )}
                     <div className="flex items-center gap-2">
@@ -358,6 +614,7 @@ export default function DataAdmin() {
             </Card>
           </TabsContent>
         </Tabs>
+        )}
       </div>
     </div>
   );

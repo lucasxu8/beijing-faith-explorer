@@ -360,6 +360,10 @@ export const MapView = ({ currentYear, onTempleSelect, selectedTemple, selectedR
             <span className="text-sm font-medium">佛教寺庙</span>
           </div>
           <div className="flex items-center gap-3">
+            <span className="text-lg">⛩️</span>
+            <span className="text-sm font-medium">道教</span>
+          </div>
+          <div className="flex items-center gap-3">
             <span className="text-lg">⛪</span>
             <span className="text-sm font-medium">天主教堂</span>
           </div>

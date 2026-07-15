@@ -27,7 +27,7 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
   if (!temple || !isOpen) return null;
 
   const religionConfig = {
-    buddhism: { label: "佛教", color: "bg-buddhism", icon: "🏯" },
+    buddhism: { label: "佛教寺庙", color: "bg-buddhism", icon: "🏯" },
     taoism: { label: "道教", color: "bg-taoism", icon: "⛩️" },
     catholic: { label: "天主教", color: "bg-catholic", icon: "⛪" },
     islam: { label: "伊斯兰教", color: "bg-islam", icon: "🕌" }

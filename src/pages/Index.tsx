@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Temple } from "@/types/temple";
 import { getTemples } from "@/services/templeService";
-import { getTempleData } from "@/lib/templeDataManager";
+import { getTempleData, saveTempleData } from "@/lib/templeDataManager";
 import { AlertCircle, Loader2 } from "lucide-react";
 
 const Index = () => {
@@ -24,18 +24,21 @@ const Index = () => {
   
   const isMobile = useIsMobile();
 
-  // 从 Firestore 获取寺庙数据
-  const { data: temples, isLoading, error, refetch } = useQuery({
-    queryKey: ['temples'],
-    queryFn: getTemples,
+  // Firestore 为权威数据源；成功后写入本地缓存
+  const { data: temples, isLoading, error, refetch, isFetching } = useQuery({
+    queryKey: ['beijing-temples'],
+    queryFn: async () => {
+      const remote = await getTemples();
+      saveTempleData(remote);
+      return remote;
+    },
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  const managedTemples = getTempleData();
-  const sourceTemples = (managedTemples.length > 0 ? managedTemples : temples || []).filter(
-    (temple) => temple.religion !== "taoism"
-  );
+  // 云端未就绪时用本地缓存兜底，避免空白屏
+  const cachedTemples = getTempleData();
+  const sourceTemples = temples ?? cachedTemples;
   const normalizedKeyword = searchKeyword.trim().toLowerCase();
   const searchSuggestions = normalizedKeyword.length === 0
     ? []
@@ -220,6 +223,7 @@ const Index = () => {
           selectedPeriods={selectedPeriods}
           onPeriodFilter={setSelectedPeriods}
           temples={sourceTemples}
+          listTemples={filteredTemples}
         />
         <div className="flex-1 flex flex-col relative">
           <MapView 
@@ -243,7 +247,7 @@ const Index = () => {
       {/* 数据状态显示 */}
       <div className="fixed bottom-4 left-4 glass-panel p-3 z-10 rounded-lg text-sm">
         <span className="text-muted-foreground">
-          数据来源: 本地数据管理后台 | 显示 {filteredTemples.length} / {sourceTemples.length} 个场所
+          数据来源: Firestore{isFetching ? "（同步中）" : ""} | 显示 {filteredTemples.length} / {sourceTemples.length} 个场所
         </span>
       </div>
     </div>
