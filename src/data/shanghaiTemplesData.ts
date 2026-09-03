@@ -1,6 +1,19 @@
 import { Temple } from "@/types/temple";
 
-/** 上海默认种子数据（可被 Firestore shanghai_temples 覆盖） */
+const emptyMeta = {
+  aliases: "",
+  religiousActivities: "",
+  volunteers: "",
+  visitorFlow: "",
+  templeNotes: "",
+  dataSource: "",
+  collector: "",
+  collectedDate: "",
+  verificationNotes: "",
+  tickets: "",
+  fixedActivitiesFestivals: "",
+};
+
 export const shanghaiTemplesData: Temple[] = [
   {
     id: "shanghai_temples_buddhism_001",
@@ -10,21 +23,13 @@ export const shanghaiTemplesData: Temple[] = [
     establishedYear: 247,
     status: "active",
     description: "上海中心城区著名的佛教寺院，历经多次修建，是上海重要的宗教与文化地标。",
-    historicalBackground:
-      "相传始建于三国吴赤乌十年，宋代定名静安寺；近代随城市发展多次重修，现为上海市重点文物保护单位。",
-    architecturalFeatures:
+    coreArchitecture:
       "红墙金瓦与现代城市街区交融，大雄宝殿、静安宝塔等为主要建筑；石刻与佛教艺术陈列丰富。",
     openingHours: "每日 07:30–17:00（以现场公告为准）",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/8/8e/Jing_An_Temple.jpg",
     coordinates: [121.4453, 31.2232],
     relatedPeople: [],
-    relatedEvents: ["三国始建", "宋代定名", "近代重修"],
-    volunteers: "",
-    prayerBlessing: "",
-    incenseStatus: "",
-    templeNotes: "",
-    fixedActivitiesFestivals: "",
-    tickets: "",
+    ...emptyMeta,
   },
   {
     id: "shanghai_temples_catholic_001",
@@ -34,21 +39,13 @@ export const shanghaiTemplesData: Temple[] = [
     establishedYear: 1910,
     status: "active",
     description: "上海规模最大的天主教堂之一，哥特式双塔建筑，徐家汇历史风貌的核心。",
-    historicalBackground:
-      "由耶稣会在徐家汇教区兴建，1910年竣工；是近代上海天主教传播与中西文化交流的重要见证。",
-    architecturalFeatures:
+    coreArchitecture:
       "砖石结构哥特复兴风格，双尖塔、彩色玻璃窗与纵深中殿构成典型教堂空间。",
     openingHours: "每日 09:00–16:30（弥撒时间以堂内公告为准）",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/4/4d/Xujiahui_Cathedral.jpg",
     coordinates: [121.4365, 31.1925],
     relatedPeople: ["耶稣会传教士"],
-    relatedEvents: ["1910年落成"],
-    volunteers: "",
-    prayerBlessing: "",
-    incenseStatus: "",
-    templeNotes: "",
-    fixedActivitiesFestivals: "",
-    tickets: "",
+    ...emptyMeta,
   },
   {
     id: "shanghai_temples_taoism_001",
@@ -58,21 +55,13 @@ export const shanghaiTemplesData: Temple[] = [
     establishedYear: 1403,
     status: "active",
     description: "上海最著名的道教宫观之一，与豫园商圈相依，香火与市井文化并存。",
-    historicalBackground:
-      "明永乐年间始建，供奉上海城隍；明清至今数次修缮，是沪上道教与民俗信仰重要场所。",
-    architecturalFeatures:
+    coreArchitecture:
       "江南道观布局，戏台、大殿与前广场相连；传统木构与砖雕装饰鲜明。",
     openingHours: "每日 08:30–16:30",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Shanghai_City_God_Temple.jpg",
     coordinates: [121.4922, 31.2277],
     relatedPeople: [],
-    relatedEvents: ["明代创建", "清代重修"],
-    volunteers: "",
-    prayerBlessing: "",
-    incenseStatus: "",
-    templeNotes: "",
-    fixedActivitiesFestivals: "",
-    tickets: "",
+    ...emptyMeta,
   },
   {
     id: "shanghai_temples_islam_001",
@@ -82,20 +71,12 @@ export const shanghaiTemplesData: Temple[] = [
     establishedYear: 1917,
     status: "active",
     description: "上海重要的伊斯兰教清真寺，近代穆斯林社群活动中心之一。",
-    historicalBackground:
-      "1917年由穆斯林绅商捐建，阿拉伯风格与中式元素结合，是上海近代伊斯兰文化的重要节点。",
-    architecturalFeatures:
+    coreArchitecture:
       "穹顶、宣礼塔与礼拜大殿为主要构成，内外装饰简洁庄重。",
     openingHours: "每日 08:00–17:00（礼拜时段以现场为准）",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Xiaotaoyuan_Mosque.jpg/1280px-Xiaotaoyuan_Mosque.jpg",
     coordinates: [121.4835, 31.2168],
     relatedPeople: [],
-    relatedEvents: ["1917年建成"],
-    volunteers: "",
-    prayerBlessing: "",
-    incenseStatus: "",
-    templeNotes: "",
-    fixedActivitiesFestivals: "",
-    tickets: "",
+    ...emptyMeta,
   },
 ];

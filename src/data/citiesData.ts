@@ -36,7 +36,8 @@ export const citiesData: City[] = [
     name: "成都",
     description: "巴蜀文化中心，佛道并存、多元信仰共生。",
     highlights: ["文殊院", "青羊宫", "平安桥天主堂"],
-    available: false,
+    route: "/chengdu",
+    available: true,
   },
   {
     id: "chongqing",

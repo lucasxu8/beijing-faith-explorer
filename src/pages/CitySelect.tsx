@@ -22,7 +22,7 @@ export default function CitySelect() {
         <section className="mb-10 text-center max-w-2xl mx-auto">
           <h2 className="text-3xl font-bold text-foreground mb-3">选择城市</h2>
           <p className="text-muted-foreground leading-relaxed">
-            从下方选择一座城市，进入该地的信仰地图。目前北京、上海已开放，更多城市将陆续上线。
+            从下方选择一座城市，进入该地的信仰地图。目前北京、上海、成都已开放，更多城市将陆续上线。
           </p>
         </section>
 

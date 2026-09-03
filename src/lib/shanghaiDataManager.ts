@@ -14,9 +14,8 @@ const isTempleLike = (value: unknown): value is Record<string, unknown> => {
   return (
     typeof candidate.id === "string" &&
     typeof candidate.name === "string" &&
-    typeof candidate.location === "string" &&
+    (typeof candidate.location === "string" || typeof candidate.address === "string") &&
     validReligion &&
-    typeof candidate.establishedYear === "number" &&
     validStatus &&
     Array.isArray(coordinates) &&
     coordinates.length === 2 &&

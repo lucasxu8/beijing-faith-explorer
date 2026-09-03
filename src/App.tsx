@@ -6,12 +6,15 @@ import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import CitySelect from "./pages/CitySelect";
 import Index from "./pages/Index";
 import ShanghaiIndex from "./pages/ShanghaiIndex";
+import ChengduIndex from "./pages/ChengduIndex";
 import NotFound from "./pages/NotFound";
 import { ImportData } from "./pages/ImportData";
 import DataAdmin from "./pages/DataAdmin";
 import DataAdminLogin from "./pages/DataAdminLogin";
 import ShanghaiDataAdmin from "./pages/ShanghaiDataAdmin";
 import ShanghaiDataAdminLogin from "./pages/ShanghaiDataAdminLogin";
+import ChengduDataAdmin from "./pages/ChengduDataAdmin";
+import ChengduDataAdminLogin from "./pages/ChengduDataAdminLogin";
 import { isAdminAuthenticated } from "./lib/adminAuth";
 
 const queryClient = new QueryClient();
@@ -39,6 +42,7 @@ const App = () => (
           <Route path="/" element={<CitySelect />} />
           <Route path="/beijing" element={<Index />} />
           <Route path="/shanghai" element={<ShanghaiIndex />} />
+          <Route path="/chengdu" element={<ChengduIndex />} />
           <Route path="/import-data" element={<ImportData />} />
           <Route path="/data-admin-login" element={<DataAdminLogin />} />
           <Route
@@ -55,6 +59,15 @@ const App = () => (
             element={
               <AdminProtectedRoute loginPath="/shanghai/data-admin-login">
                 <ShanghaiDataAdmin />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route path="/chengdu/data-admin-login" element={<ChengduDataAdminLogin />} />
+          <Route
+            path="/chengdu/data-admin"
+            element={
+              <AdminProtectedRoute loginPath="/chengdu/data-admin-login">
+                <ChengduDataAdmin />
               </AdminProtectedRoute>
             }
           />

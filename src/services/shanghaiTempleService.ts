@@ -12,7 +12,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { normalizeTemple } from "@/lib/templeDataManager";
+import { normalizeTemple, templeDocumentFields } from "@/lib/templeDataManager";
 import { Temple } from "@/types/temple";
 
 const COLLECTION = "shanghai_temples";
@@ -42,25 +42,7 @@ const toFirestorePayload = (temple: Temple) => {
   }
 
   return stripUndefined({
-    id: temple.id,
-    name: temple.name ?? "",
-    location: temple.location ?? "",
-    religion: temple.religion,
-    establishedYear: Number(temple.establishedYear) || 0,
-    status: temple.status,
-    description: temple.description ?? "",
-    historicalBackground: temple.historicalBackground ?? "",
-    architecturalFeatures: temple.architecturalFeatures ?? "",
-    openingHours: temple.openingHours ?? "",
-    imageUrl: temple.imageUrl ?? "",
-    relatedPeople: Array.isArray(temple.relatedPeople) ? temple.relatedPeople : [],
-    relatedEvents: Array.isArray(temple.relatedEvents) ? temple.relatedEvents : [],
-    volunteers: temple.volunteers ?? "",
-    prayerBlessing: temple.prayerBlessing ?? "",
-    incenseStatus: temple.incenseStatus ?? "",
-    templeNotes: temple.templeNotes ?? "",
-    fixedActivitiesFestivals: temple.fixedActivitiesFestivals ?? "",
-    tickets: temple.tickets ?? "",
+    ...templeDocumentFields(temple),
     coordinates: new GeoPoint(lat, lng),
   });
 };

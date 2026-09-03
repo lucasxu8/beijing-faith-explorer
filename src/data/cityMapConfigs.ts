@@ -1,4 +1,4 @@
-export type CityMapId = "beijing" | "shanghai";
+export type CityMapId = "beijing" | "shanghai" | "chengdu";
 
 export interface CityMapConfig {
   id: CityMapId;
@@ -27,6 +27,16 @@ export const cityMapConfigs: Record<CityMapId, CityMapConfig> = {
     maxBounds: [
       [120.85, 30.7],
       [122.0, 31.55],
+    ],
+  },
+  chengdu: {
+    id: "chengdu",
+    name: "成都",
+    center: [104.0665, 30.5723],
+    zoom: 11,
+    maxBounds: [
+      [103.7, 30.35],
+      [104.45, 30.85],
     ],
   },
 };

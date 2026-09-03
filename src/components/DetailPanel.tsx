@@ -116,6 +116,10 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
             )}
           </div>
 
+          {temple.aliases.trim() && (
+            <p className="text-sm text-muted-foreground mt-2">别名/曾用名：{temple.aliases}</p>
+          )}
+
           {/* Basic Information */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-sm">
@@ -126,17 +130,13 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
             <div className="flex items-center gap-2 text-sm">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span className="text-foreground">
-                建立于 {temple.establishedYear}年
-                {temple.establishedYear < 1000 ? " (唐代)" : 
-                 temple.establishedYear < 1368 ? " (宋代)" :
-                 temple.establishedYear < 1644 ? " (明代)" :
-                 temple.establishedYear < 1912 ? " (清代)" : " (近现代)"}
+                始建年代 {temple.establishedYear}年
               </span>
             </div>
 
             <div className="flex items-center gap-2 text-sm">
               <div className={`w-3 h-3 rounded-full ${status.color}`} />
-              <span className="text-foreground">{status.label}</span>
+              <span className="text-foreground">现状：{status.label}</span>
             </div>
 
             {temple.openingHours.trim() && (
@@ -149,7 +149,6 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
 
           <Separator />
 
-          {/* Description */}
           <div>
             <h3 className="font-semibold text-foreground mb-2">简介</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -157,101 +156,13 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
             </p>
           </div>
 
-          {temple.historicalBackground.trim() && (
+          {temple.coreArchitecture.trim() && (
             <>
               <Separator />
               <div>
-                <h3 className="font-semibold text-foreground mb-2">历史背景</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {temple.historicalBackground}
-                </p>
-              </div>
-            </>
-          )}
-
-          {temple.architecturalFeatures.trim() && (
-            <>
-              <Separator />
-              <div>
-                <h3 className="font-semibold text-foreground mb-2">建筑特点</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {temple.architecturalFeatures}
-                </p>
-              </div>
-            </>
-          )}
-
-          {temple.relatedPeople.length > 0 && (
-            <>
-              <Separator />
-              <div>
-                <h3 className="font-semibold text-foreground mb-2">相关人物</h3>
-                <div className="flex flex-wrap gap-2">
-                  {temple.relatedPeople.map((person, index) => (
-                    <Badge key={index} variant="outline" className="cursor-pointer hover:bg-muted">
-                      {person}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-
-          {temple.volunteers.trim() && (
-            <>
-              <Separator />
-              <div>
-                <h3 className="font-semibold text-foreground mb-2">义工情况</h3>
+                <h3 className="font-semibold text-foreground mb-2">核心建筑</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                  {temple.volunteers}
-                </p>
-              </div>
-            </>
-          )}
-
-          {temple.prayerBlessing.trim() && (
-            <>
-              <Separator />
-              <div>
-                <h3 className="font-semibold text-foreground mb-2">祈福方式</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                  {temple.prayerBlessing}
-                </p>
-              </div>
-            </>
-          )}
-
-          {temple.incenseStatus.trim() && (
-            <>
-              <Separator />
-              <div>
-                <h3 className="font-semibold text-foreground mb-2">香火情况</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                  {temple.incenseStatus}
-                </p>
-              </div>
-            </>
-          )}
-
-          {temple.templeNotes.trim() && (
-            <>
-              <Separator />
-              <div>
-                <h3 className="font-semibold text-foreground mb-2">寺庙注意事项</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                  {temple.templeNotes}
-                </p>
-              </div>
-            </>
-          )}
-
-          {temple.fixedActivitiesFestivals.trim() && (
-            <>
-              <Separator />
-              <div>
-                <h3 className="font-semibold text-foreground mb-2">固定活动 / 重大节日</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                  {temple.fixedActivitiesFestivals}
+                  {temple.coreArchitecture}
                 </p>
               </div>
             </>
@@ -269,19 +180,102 @@ export const DetailPanel = ({ temple, isOpen, onClose, isMobile }: DetailPanelPr
             </>
           )}
 
-          {/* Related Events */}
-          {temple.relatedEvents.length > 0 && (
+          {temple.fixedActivitiesFestivals.trim() && (
             <>
               <Separator />
               <div>
-                <h3 className="font-semibold text-foreground mb-2">相关事件</h3>
-                <div className="space-y-2">
-                  {temple.relatedEvents.map((event, index) => (
-                    <div key={index} className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
-                      • {event}
-                    </div>
+                <h3 className="font-semibold text-foreground mb-2">固定活动/重大宗教节日</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {temple.fixedActivitiesFestivals}
+                </p>
+              </div>
+            </>
+          )}
+
+          {temple.relatedPeople.length > 0 && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">相关人物</h3>
+                <div className="flex flex-wrap gap-2">
+                  {temple.relatedPeople.map((person, index) => (
+                    <Badge key={index} variant="outline">
+                      {person}
+                    </Badge>
                   ))}
                 </div>
+              </div>
+            </>
+          )}
+
+          {temple.religiousActivities.trim() && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">宗教活动内容</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {temple.religiousActivities}
+                </p>
+              </div>
+            </>
+          )}
+
+          {temple.volunteers.trim() && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">义工情况</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {temple.volunteers}
+                </p>
+              </div>
+            </>
+          )}
+
+          {temple.visitorFlow.trim() && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">人流/香火情况</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {temple.visitorFlow}
+                </p>
+              </div>
+            </>
+          )}
+
+          {temple.templeNotes.trim() && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">寺庙注意事项</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {temple.templeNotes}
+                </p>
+              </div>
+            </>
+          )}
+
+          {(temple.dataSource.trim() || temple.collector.trim() || temple.collectedDate.trim()) && (
+            <>
+              <Separator />
+              <div className="space-y-1 text-sm text-muted-foreground">
+                <h3 className="font-semibold text-foreground mb-2">采集信息</h3>
+                {temple.dataSource.trim() && <p>数据来源：{temple.dataSource}</p>}
+                {temple.collector.trim() && <p>采集人：{temple.collector}</p>}
+                {temple.collectedDate.trim() && <p>采集日期：{temple.collectedDate}</p>}
+              </div>
+            </>
+          )}
+
+          {temple.verificationNotes.trim() && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">待核实备注</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {temple.verificationNotes}
+                </p>
               </div>
             </>
           )}

@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Temple } from "@/types/temple";
 import { getTemples } from "@/services/templeService";
-import { getTempleData, saveTempleData } from "@/lib/templeDataManager";
+import { getTempleData, saveTempleData, searchableTempleText } from "@/lib/templeDataManager";
 import { AlertCircle, Loader2 } from "lucide-react";
 
 const Index = () => {
@@ -44,25 +44,7 @@ const Index = () => {
     ? []
     : sourceTemples
         .filter((temple) =>
-          [
-            temple.name,
-            temple.location,
-            temple.description,
-            temple.historicalBackground,
-            temple.architecturalFeatures,
-            temple.openingHours,
-            temple.volunteers,
-            temple.prayerBlessing,
-            temple.incenseStatus,
-            temple.templeNotes,
-            temple.fixedActivitiesFestivals,
-            temple.tickets,
-            ...temple.relatedPeople,
-            ...temple.relatedEvents,
-          ]
-            .join(" ")
-            .toLowerCase()
-            .includes(normalizedKeyword)
+          searchableTempleText(temple).toLowerCase().includes(normalizedKeyword)
         )
         .slice(0, 8);
 
@@ -83,27 +65,7 @@ const Index = () => {
       });
     const searchFilter =
       normalizedKeyword.length === 0 ||
-      [
-        temple.name,
-        temple.location,
-        temple.description,
-        temple.historicalBackground,
-        temple.architecturalFeatures,
-        temple.openingHours,
-        temple.religion,
-        String(temple.establishedYear),
-        temple.volunteers,
-        temple.prayerBlessing,
-        temple.incenseStatus,
-        temple.templeNotes,
-        temple.fixedActivitiesFestivals,
-        temple.tickets,
-        ...temple.relatedPeople,
-        ...temple.relatedEvents,
-      ]
-        .join(" ")
-        .toLowerCase()
-        .includes(normalizedKeyword);
+      searchableTempleText(temple).toLowerCase().includes(normalizedKeyword);
 
     return yearFilter && religionFilter && periodFilter && searchFilter;
   });
