@@ -208,6 +208,7 @@ const Index = () => {
             selectedTemple={selectedTemple}
             selectedReligions={selectedReligions}
             temples={filteredTemples}
+            isMobile={isMobile}
           />
         </div>
         {selectedTemple && (

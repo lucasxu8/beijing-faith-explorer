@@ -13,6 +13,7 @@ interface MapViewProps {
   selectedTemple: Temple | null;
   selectedReligions?: string[];
   temples: Temple[];
+  isMobile?: boolean;
 }
 
 export const MapView = ({
@@ -22,6 +23,7 @@ export const MapView = ({
   selectedTemple,
   selectedReligions = [],
   temples,
+  isMobile = false,
 }: MapViewProps) => {
   const mapConfig = cityMapConfigs[cityId];
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -75,7 +77,7 @@ export const MapView = ({
     // Set access token
     mapboxgl.accessToken = mapboxToken;
 
-    // Initialize map for the selected city
+    // 不限制城市范围，便于跟到周边（如成都数据里的乐山寺庙）
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: getMapboxStyle(mapStyle),
@@ -84,7 +86,6 @@ export const MapView = ({
       pitch: 0,
       bearing: 0,
       antialias: true,
-      maxBounds: mapConfig.maxBounds,
     });
 
     console.log('Map initialized');
@@ -127,6 +128,65 @@ export const MapView = ({
       updateMarkers();
     }
   }, [temples, currentYear, selectedReligions]);
+
+  // 从列表/标记选中寺庙时，等布局稳定后再把目标点放到可视区域正中
+  useEffect(() => {
+    if (!map.current || !selectedTemple) return;
+
+    const [lng, lat] = selectedTemple.coordinates ?? [];
+    if (!Number.isFinite(lng) || !Number.isFinite(lat)) return;
+
+    let cancelled = false;
+    let rafOuter = 0;
+    let rafInner = 0;
+    let timeoutId = 0;
+
+    const getPadding = () =>
+      isMobile
+        ? {
+            top: 48,
+            bottom: Math.round(window.innerHeight * 0.42),
+            left: 24,
+            right: 24,
+          }
+        : { top: 48, bottom: 48, left: 48, right: 48 };
+
+    const focusTemple = (animated: boolean) => {
+      if (cancelled || !map.current) return;
+      map.current.resize();
+      const options = {
+        center: [lng, lat] as [number, number],
+        zoom: Math.max(map.current.getZoom(), 15),
+        essential: true as const,
+        padding: getPadding(),
+      };
+      if (animated) {
+        map.current.flyTo({ ...options, duration: 900 });
+      } else {
+        map.current.easeTo({ ...options, duration: 280 });
+      }
+    };
+
+    // 等详情面板插入 DOM、flex 重排完成后再定位
+    rafOuter = requestAnimationFrame(() => {
+      rafInner = requestAnimationFrame(() => {
+        focusTemple(true);
+        timeoutId = window.setTimeout(() => focusTemple(false), 140);
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(rafOuter);
+      cancelAnimationFrame(rafInner);
+      window.clearTimeout(timeoutId);
+    };
+  }, [
+    selectedTemple?.id,
+    selectedTemple?.coordinates?.[0],
+    selectedTemple?.coordinates?.[1],
+    isMobile,
+  ]);
 
   const getMapboxStyle = (style: string) => {
     switch (style) {
