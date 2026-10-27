@@ -27,7 +27,9 @@ export default function CitySelect() {
         </section>
 
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {citiesData.map((city) => {
+          {[...citiesData]
+            .sort((a, b) => Number(b.available) - Number(a.available))
+            .map((city) => {
             const cardContent = (
               <>
                 <div className="flex items-start justify-between gap-3 mb-3">
