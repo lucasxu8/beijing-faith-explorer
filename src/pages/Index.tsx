@@ -214,7 +214,7 @@ const Index = () => {
         {selectedTemple && (
           <DetailPanel 
             temple={selectedTemple}
-            onClose={() => setSelectedTemple(null)}
+            onClose={handleDetailClose}
             isOpen={!!selectedTemple}
             isMobile={isMobile}
           />

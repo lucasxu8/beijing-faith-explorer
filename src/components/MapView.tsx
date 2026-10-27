@@ -115,7 +115,14 @@ export const MapView = ({
       console.error('Map error:', e);
     });
 
+    // 详情面板开合会改变地图容器宽度，必须同步 resize，否则关闭后会留白
+    const resizeObserver = new ResizeObserver(() => {
+      map.current?.resize();
+    });
+    resizeObserver.observe(mapContainer.current);
+
     return () => {
+      resizeObserver.disconnect();
       markers.current.forEach(marker => marker.remove());
       markers.current = [];
       map.current?.remove();
@@ -128,6 +135,39 @@ export const MapView = ({
       updateMarkers();
     }
   }, [temples, currentYear, selectedReligions]);
+
+  // 关闭详情面板后清掉 flyTo 残留 padding，并强制重算尺寸
+  useEffect(() => {
+    if (!map.current || selectedTemple) return;
+
+    let cancelled = false;
+    let rafOuter = 0;
+    let rafInner = 0;
+    let timeoutId = 0;
+
+    const resetLayout = () => {
+      if (cancelled || !map.current) return;
+      map.current.resize();
+      map.current.easeTo({
+        padding: { top: 0, bottom: 0, left: 0, right: 0 },
+        duration: 0,
+      });
+    };
+
+    rafOuter = requestAnimationFrame(() => {
+      rafInner = requestAnimationFrame(() => {
+        resetLayout();
+        timeoutId = window.setTimeout(resetLayout, 120);
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(rafOuter);
+      cancelAnimationFrame(rafInner);
+      window.clearTimeout(timeoutId);
+    };
+  }, [selectedTemple]);
 
   // 从列表/标记选中寺庙时，等布局稳定后再把目标点放到可视区域正中
   useEffect(() => {
