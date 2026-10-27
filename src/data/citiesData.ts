@@ -72,7 +72,8 @@ export const citiesData: City[] = [
     name: "武汉",
     description: "九省通衢，长江沿岸宗教文化走廊。",
     highlights: ["归元寺", "长春观", "上海路天主堂"],
-    available: false,
+    route: "/wuhan",
+    available: true,
   },
   {
     id: "tianjin",
