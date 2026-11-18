@@ -45,7 +45,8 @@ export const citiesData: City[] = [
     name: "西安",
     description: "丝绸之路起点，佛教、道教与伊斯兰文化重镇。",
     highlights: ["大雁塔", "化觉巷清真寺", "楼观台"],
-    available: false,
+    route: "/xian",
+    available: true,
   },
   {
     id: "chongqing",

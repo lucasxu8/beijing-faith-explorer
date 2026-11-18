@@ -1,0 +1,85 @@
+import { Temple } from "@/types/temple";
+
+const emptyMeta = {
+  aliases: "",
+  religiousActivities: "",
+  volunteers: "",
+  visitorFlow: "",
+  templeNotes: "",
+  dataSource: "",
+  collector: "",
+  collectedDate: "",
+  verificationNotes: "",
+  tickets: "",
+  fixedActivitiesFestivals: "",
+};
+
+/** 西安默认种子数据（可被 Firestore xian_temples 覆盖） */
+export const xianTemplesData: Temple[] = [
+  {
+    id: "xian_temples_buddhism_001",
+    name: "大雁塔",
+    location: "西安市雁塔区慈恩路",
+    religion: "buddhism",
+    establishedYear: 652,
+    status: "active",
+    description: "唐长安城重要的佛教建筑与丝路文化象征，玄奘译经之所大慈恩寺的标志。",
+    coreArchitecture:
+      "楼阁式砖塔为中心，寺内大殿与庭院环绕；塔身逐层收分，是唐代佛教建筑的典型遗存。",
+    openingHours: "每日 08:00–17:30（以现场公告为准）",
+    imageUrl: "",
+    coordinates: [108.9645, 34.2186],
+    relatedPeople: ["玄奘"],
+    ...emptyMeta,
+    aliases: "慈恩寺塔",
+  },
+  {
+    id: "xian_temples_islam_001",
+    name: "化觉巷清真寺",
+    location: "西安市莲湖区化觉巷30号",
+    religion: "islam",
+    establishedYear: 742,
+    status: "active",
+    description: "中国现存规模较大、历史悠久的清真寺之一，中式建筑与伊斯兰礼仪空间结合。",
+    coreArchitecture:
+      "五进院落布局，礼拜大殿、省心楼、凤凰亭等为主要建筑；木构与砖雕装饰丰富。",
+    openingHours: "每日 08:00–17:00（礼拜时段以现场为准）",
+    imageUrl: "",
+    coordinates: [108.9428, 34.2635],
+    relatedPeople: [],
+    ...emptyMeta,
+    aliases: "西安大清真寺",
+  },
+  {
+    id: "xian_temples_taoism_001",
+    name: "楼观台",
+    location: "西安市周至县楼观镇",
+    religion: "taoism",
+    establishedYear: 600,
+    status: "active",
+    description: "道教重要祖庭之一，相传与老子讲经相关，是关中道教文化的代表性场所。",
+    coreArchitecture:
+      "依山而建的宫观格局，说经台、宗圣宫等遗址与殿宇相映；山林与道观融为一体。",
+    openingHours: "每日 08:00–17:00",
+    imageUrl: "",
+    coordinates: [108.3305, 34.0585],
+    relatedPeople: ["老子"],
+    ...emptyMeta,
+  },
+  {
+    id: "xian_temples_catholic_001",
+    name: "西安南堂",
+    location: "西安市碑林区五星街",
+    religion: "catholic",
+    establishedYear: 1716,
+    status: "active",
+    description: "西安重要的天主教堂，见证近代天主教在关中地区的传播。",
+    coreArchitecture:
+      "砖石结构教堂建筑，钟楼与中殿构成主体；立面简洁庄重。",
+    openingHours: "每日 08:00–17:00（弥撒时间以堂内公告为准）",
+    imageUrl: "",
+    coordinates: [108.9408, 34.255],
+    relatedPeople: [],
+    ...emptyMeta,
+  },
+];

@@ -1,4 +1,4 @@
-export type CityMapId = "beijing" | "shanghai" | "chengdu" | "wuhan";
+export type CityMapId = "beijing" | "shanghai" | "chengdu" | "wuhan" | "xian";
 
 export interface CityMapConfig {
   id: CityMapId;
@@ -30,6 +30,12 @@ export const cityMapConfigs: Record<CityMapId, CityMapConfig> = {
     id: "wuhan",
     name: "武汉",
     center: [114.3055, 30.5928],
+    zoom: 11,
+  },
+  xian: {
+    id: "xian",
+    name: "西安",
+    center: [108.9402, 34.3416],
     zoom: 11,
   },
 };

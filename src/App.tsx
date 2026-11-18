@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import ShanghaiIndex from "./pages/ShanghaiIndex";
 import ChengduIndex from "./pages/ChengduIndex";
 import WuhanIndex from "./pages/WuhanIndex";
+import XianIndex from "./pages/XianIndex";
 import NotFound from "./pages/NotFound";
 import { ImportData } from "./pages/ImportData";
 import DataAdmin from "./pages/DataAdmin";
@@ -18,6 +19,8 @@ import ChengduDataAdmin from "./pages/ChengduDataAdmin";
 import ChengduDataAdminLogin from "./pages/ChengduDataAdminLogin";
 import WuhanDataAdmin from "./pages/WuhanDataAdmin";
 import WuhanDataAdminLogin from "./pages/WuhanDataAdminLogin";
+import XianDataAdmin from "./pages/XianDataAdmin";
+import XianDataAdminLogin from "./pages/XianDataAdminLogin";
 import { isAdminAuthenticated } from "./lib/adminAuth";
 
 const queryClient = new QueryClient();
@@ -47,6 +50,7 @@ const App = () => (
           <Route path="/shanghai" element={<ShanghaiIndex />} />
           <Route path="/chengdu" element={<ChengduIndex />} />
           <Route path="/wuhan" element={<WuhanIndex />} />
+          <Route path="/xian" element={<XianIndex />} />
           <Route path="/import-data" element={<ImportData />} />
           <Route path="/data-admin-login" element={<DataAdminLogin />} />
           <Route
@@ -81,6 +85,15 @@ const App = () => (
             element={
               <AdminProtectedRoute loginPath="/wuhan/data-admin-login">
                 <WuhanDataAdmin />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route path="/xian/data-admin-login" element={<XianDataAdminLogin />} />
+          <Route
+            path="/xian/data-admin"
+            element={
+              <AdminProtectedRoute loginPath="/xian/data-admin-login">
+                <XianDataAdmin />
               </AdminProtectedRoute>
             }
           />
